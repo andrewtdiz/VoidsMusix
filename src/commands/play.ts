@@ -1,20 +1,28 @@
-import { SlashCommandBuilder, CommandInteraction, CacheType } from 'discord.js';
-import { joinVoiceChannel, AudioPlayerStatus, VoiceConnection } from '@discordjs/voice';
-import { queue, playNextSong, audioPlayer, setConnection } from '../index';
-import play from 'play-dl';
-import { logAction } from '../utils/logAction';
+import { SlashCommandBuilder, CommandInteraction, CacheType } from "discord.js";
+import {
+  joinVoiceChannel,
+  AudioPlayerStatus,
+  VoiceConnection,
+} from "@discordjs/voice";
+import { queue, playNextSong, audioPlayer, setConnection } from "../index";
+import play from "play-dl";
+import { logAction } from "../utils/logAction";
 
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds} minutes`;
+  return `${minutes}:${
+    remainingSeconds < 10 ? "0" : ""
+  }${remainingSeconds} minutes`;
 }
 
-function getConnection(interaction: CommandInteraction<CacheType>): VoiceConnection | null {
+function getConnection(
+  interaction: CommandInteraction<CacheType>
+): VoiceConnection | null {
   const member = interaction.member;
   const guild = interaction.guild;
 
-  if (!member || !('voice' in member) || !member.voice.channel || !guild) {
+  if (!member || !("voice" in member) || !member.voice.channel || !guild) {
     return null;
   }
 
@@ -27,11 +35,12 @@ function getConnection(interaction: CommandInteraction<CacheType>): VoiceConnect
 
 const playCommand = {
   data: new SlashCommandBuilder()
-    .setName('play')
-    .setDescription('Search for a song on YouTube and play it')
-    .addStringOption(option =>
-      option.setName('query')
-        .setDescription('The search query to find the song')
+    .setName("play")
+    .setDescription("Search for a song on YouTube and play it")
+    .addStringOption((option) =>
+      option
+        .setName("query")
+        .setDescription("The search query to find the song")
         .setRequired(true)
     ),
 
@@ -39,11 +48,13 @@ const playCommand = {
     try {
       await interaction.deferReply();
 
-      const query = interaction.options.get('query')?.value as string;
+      const query = interaction.options.get("query")?.value as string;
       const connection = getConnection(interaction);
 
       if (!connection) {
-        return interaction.editReply('You need to be in a voice channel to play music!');
+        return interaction.editReply(
+          "You need to be in a voice channel to play music!"
+        );
       }
 
       setConnection(connection);
@@ -52,12 +63,18 @@ const playCommand = {
       const video = searchResult[0];
 
       if (!video) {
-        return interaction.editReply('No results found for your query.');
+        return interaction.editReply("No results found for your query.");
       }
 
       const songInfo = await play.video_info(video.url);
       const durationInSeconds = songInfo.video_details.durationInSec;
       const durationFormatted = formatTime(durationInSeconds);
+
+      if (durationInSeconds > 60 * 10) {
+        return interaction.editReply(
+          `This song is longer than 10 minutes (${durationFormatted}). Please choose a shorter song.`
+        );
+      }
 
       const song = {
         title: video.title || "Unknown Title",
@@ -65,11 +82,13 @@ const playCommand = {
       };
 
       queue.push(song);
-      await interaction.editReply(`Added **${song.title}** to the queue! Duration: ${durationFormatted}`);
+      await interaction.editReply(
+        `Added **${song.title}** to the queue! Duration: ${durationFormatted}`
+      );
 
       logAction(
         interaction.client,
-        'Play',
+        "Play",
         `Added ${song.title} to the queue.`,
         interaction.user,
         song.url
@@ -79,15 +98,19 @@ const playCommand = {
         playNextSong(connection);
       }
     } catch (error) {
-      console.error('Error handling play command:', error);
+      console.error("Error handling play command:", error);
       try {
         if (interaction.deferred) {
-          await interaction.editReply('There was an error trying to execute this command!');
+          await interaction.editReply(
+            "There was an error trying to execute this command!"
+          );
         } else {
-          await interaction.reply('There was an error trying to execute this command!');
+          await interaction.reply(
+            "There was an error trying to execute this command!"
+          );
         }
       } catch (replyError) {
-        console.error('Error sending reply:', replyError);
+        console.error("Error sending reply:", replyError);
       }
     }
   },
