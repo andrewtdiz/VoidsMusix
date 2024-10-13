@@ -49,16 +49,6 @@ const playCommand = {
       await interaction.deferReply();
 
       const query = interaction.options.get("query")?.value as string;
-      const connection = getConnection(interaction);
-
-      if (!connection) {
-        return interaction.editReply(
-          "You need to be in a voice channel to play music!"
-        );
-      }
-
-      setConnection(connection);
-
       const searchResult = await play.search(query, { limit: 1 });
       const video = searchResult[0];
 
@@ -75,6 +65,16 @@ const playCommand = {
           `This song is longer than 10 minutes (${durationFormatted}). Please choose a shorter song.`
         );
       }
+
+      const connection = getConnection(interaction);
+
+      if (!connection) {
+        return interaction.editReply(
+          "You need to be in a voice channel to play music!"
+        );
+      }
+
+      setConnection(connection);
 
       const song = {
         title: video.title || "Unknown Title",
