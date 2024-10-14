@@ -28,6 +28,16 @@ const playCommand = {
       await interaction.deferReply();
 
       const query = interaction.options.get("query")?.value as string;
+      // const connection = getConnection(interaction);
+
+      // if (!connection) {
+      //   return interaction.editReply(
+      //     "You need to be in a voice channel to play music!"
+      //   );
+      // }
+
+      // setConnection(connection);
+
       const searchResult = await play.search(query, { limit: 1 });
       const video = searchResult[0];
 
@@ -45,6 +55,7 @@ const playCommand = {
         );
       }
 
+<<<<<<< HEAD
       const connection = getConnection(interaction);
 
       if (!connection) {
@@ -55,6 +66,8 @@ const playCommand = {
 
       setConnection(connection);
 
+=======
+>>>>>>> parent of 21f9aab (fix: check song duration)
       const song = {
         title: video.title || "Unknown Title",
         url: video.url,
