@@ -1,27 +1,22 @@
-import { SlashCommandBuilder, CommandInteraction, CacheType, EmbedBuilder } from 'discord.js';
+import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { client } from '../index';
+import { logAction } from '../utils/logAction';
 
-const pingCommand = {
+export default {
   data: new SlashCommandBuilder()
     .setName('ping')
     .setDescription('Check the bot\'s latency'),
 
-  async execute(interaction: CommandInteraction<CacheType>) {
+  async execute(interaction: CommandInteraction) {
     const sent = await interaction.reply({ content: 'Pinging...', fetchReply: true });
 
     const latency = sent.createdTimestamp - interaction.createdTimestamp;
     const apiLatency = Math.round(interaction.client.ws.ping);
 
-    const embed = new EmbedBuilder()
-      .setColor('#0099ff')
-      .setTitle('Command Received')
-      .addFields(
-        { name: 'Latency', value: `${latency}ms`, inline: true },
-        { name: 'API Latency', value: `${apiLatency}ms`, inline: true }
-      )
-      .setTimestamp();
+    await interaction.editReply({
+      content: `Latency: ${latency}ms\nAPI Latency: ${apiLatency}ms`
+    });
 
-    await interaction.editReply({ content: '', embeds: [embed] });
+    logAction(client, 'Ping', `Checked latency: ${latency}ms, API Latency: ${apiLatency}ms`, interaction.user);
   },
 };
-
-export default pingCommand;

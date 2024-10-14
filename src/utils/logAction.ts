@@ -3,7 +3,7 @@ import { Client, TextChannel, EmbedBuilder, User } from 'discord.js';
 require('dotenv').config();
 const LOG_CHANNEL_ID = process.env.LOG_CHANNEL_ID as string;
 
-export function logAction(client: Client, action: string, details: string, user: User, videoLink: string) {
+export function logAction(client: Client, action: string, details: string, user: User, videoLink?: string) {
   const channel = client.channels.cache.get(LOG_CHANNEL_ID) as TextChannel;
 
   if (!channel) {
@@ -18,7 +18,7 @@ export function logAction(client: Client, action: string, details: string, user:
       { name: 'Action', value: action, inline: true },
       { name: 'Details', value: details, inline: true },
       { name: 'User', value: `<@${user.id}>`, inline: true },
-      { name: 'Video Link', value: `[Click here](${videoLink})`, inline: true }
+      ...(videoLink ? [{ name: 'Video Link', value: `[Click here](${videoLink})`, inline: true }] : [])
     )
     .setTimestamp();
 

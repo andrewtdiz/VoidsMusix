@@ -77,9 +77,9 @@ client.on('interactionCreate', async (interaction: Interaction) => {
     case 'djmode':
       await djmodeCommand.execute(interaction);
       break;
-      case 'ping':
-        await pingCommand.execute(interaction);
-        break;
+    case 'ping':
+      await pingCommand.execute(interaction);
+      break;
   }
 });
 

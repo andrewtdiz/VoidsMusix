@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, CommandInteraction, CacheType } from 'discord.js';
 import { audioPlayer, queue, playNextSong, setCurrentSong, connection, client } from '../index';
 import { logAction } from '../utils/logAction';
+import { getConnection } from '../utils/voiceChannelCheck';
 
 const skipCommand = {
   data: new SlashCommandBuilder()
@@ -8,6 +9,10 @@ const skipCommand = {
     .setDescription('Skip the currently playing song'),
 
   async execute(interaction: CommandInteraction<CacheType>) {
+    if (!getConnection(interaction)) {
+      return interaction.reply("You need to be in the same voice channel as the bot to use this command!");
+    }
+
     if (!connection) {
       setCurrentSong(null);
       return interaction.reply('No active voice connection.');
