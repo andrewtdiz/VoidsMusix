@@ -1,15 +1,36 @@
-// play.ts
 import { SlashCommandBuilder, CommandInteraction, CacheType } from "discord.js";
-import { joinVoiceChannel, AudioPlayerStatus, VoiceConnection } from "@discordjs/voice";
+import {
+  joinVoiceChannel,
+  AudioPlayerStatus,
+  VoiceConnection,
+} from "@discordjs/voice";
 import { queue, playNextSong, audioPlayer, setConnection } from "../index";
 import play from "play-dl";
 import { logAction } from "../utils/logAction";
-import { getConnection } from "../utils/voiceChannelCheck"; // Import the updated function
 
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds} minutes`;
+  return `${minutes}:${
+    remainingSeconds < 10 ? "0" : ""
+  }${remainingSeconds} minutes`;
+}
+
+function getConnection(
+  interaction: CommandInteraction<CacheType>
+): VoiceConnection | null {
+  const member = interaction.member;
+  const guild = interaction.guild;
+
+  if (!member || !("voice" in member) || !member.voice.channel || !guild) {
+    return null;
+  }
+
+  return joinVoiceChannel({
+    channelId: member.voice.channel.id,
+    guildId: guild.id,
+    adapterCreator: guild.voiceAdapterCreator,
+  });
 }
 
 const playCommand = {
@@ -28,16 +49,6 @@ const playCommand = {
       await interaction.deferReply();
 
       const query = interaction.options.get("query")?.value as string;
-      // const connection = getConnection(interaction);
-
-      // if (!connection) {
-      //   return interaction.editReply(
-      //     "You need to be in a voice channel to play music!"
-      //   );
-      // }
-
-      // setConnection(connection);
-
       const searchResult = await play.search(query, { limit: 1 });
       const video = searchResult[0];
 
@@ -55,19 +66,16 @@ const playCommand = {
         );
       }
 
-<<<<<<< HEAD
       const connection = getConnection(interaction);
 
       if (!connection) {
         return interaction.editReply(
-          "You need to be in the same voice channel as the bot to play music!"
+          "You need to be in a voice channel to play music!"
         );
       }
 
       setConnection(connection);
 
-=======
->>>>>>> parent of 21f9aab (fix: check song duration)
       const song = {
         title: video.title || "Unknown Title",
         url: video.url,
