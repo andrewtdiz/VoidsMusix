@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, CommandInteraction, CacheType } from 'discord.js';
 import { audioPlayer, queue, playNextSong, setCurrentSong, connection, client } from '../index';
 import { logAction } from '../utils/logAction';
+import { isInSameVoiceChannelAsBot } from '../utils/isInSameVoiceChannelAsBot';
 
 const skipCommand = {
   data: new SlashCommandBuilder()
@@ -12,9 +13,17 @@ const skipCommand = {
       setCurrentSong(null);
       return interaction.reply('No active voice connection.');
     }
+    
+    if (!isInSameVoiceChannelAsBot(interaction)) {
+      return interaction.reply({
+        content:
+          "You need to be in the same voice channel as the bot to stop the music!",
+      });
+    }
 
     if (queue.length === 0) {
       audioPlayer.stop();
+      connection.destroy();
       logAction(client, 'Skip', 'No song to play next', interaction.user, 'N/A');
       return interaction.reply('Skipped the current song');
     }

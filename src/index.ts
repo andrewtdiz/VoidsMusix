@@ -28,7 +28,7 @@ export let queue: Song[] = [];
 export let currentSong: Song | null = null;
 export let audioPlayer: AudioPlayer = createAudioPlayer();
 export let connection: VoiceConnection | null = null;
-let idleTimeout: NodeJS.Timeout | null = null;
+let idleTimeout: NodeJS.Timer | null = null;
 
 export function setCurrentSong(song: Song | null) {
   currentSong = song;
