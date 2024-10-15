@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction, CacheType, Role, GuildMember } from 'discord.js';
+import { SlashCommandBuilder, CommandInteraction, CacheType, Role, GuildMember, PermissionsBitField } from 'discord.js';
 
 let djMode = false;
 let djRole: Role | null = null;
@@ -19,6 +19,10 @@ const djmodeCommand = {
     ),
 
   async execute(interaction: CommandInteraction<CacheType>) {
+    if (!interaction.memberPermissions?.has(PermissionsBitField.Flags.BanMembers)) {
+      return interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true });
+    }
+
     const status = interaction.options.get('status')?.value as boolean;
     const role = interaction.options.get('role')?.role as Role;
 
