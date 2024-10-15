@@ -7,6 +7,7 @@ import {
 import { queue, playNextSong, audioPlayer, setConnection } from "../index";
 import play from "play-dl";
 import { logAction } from "../utils/logAction";
+import { isInSameVoiceChannelAsBot } from "../utils/isInSameVoiceChannelAsBot";
 
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
@@ -54,6 +55,12 @@ const playCommand = {
 
       if (!video) {
         return interaction.editReply("No results found for your query.");
+      }
+
+      if (!isInSameVoiceChannelAsBot(interaction)) {
+        return interaction.editReply(
+          "You need to be in the same voice channel as the bot to play music!"
+        );
       }
 
       const songInfo = await play.video_info(video.url);
