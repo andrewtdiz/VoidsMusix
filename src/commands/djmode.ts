@@ -1,39 +1,54 @@
-import { SlashCommandBuilder, CommandInteraction, CacheType, Role, GuildMember, PermissionsBitField } from 'discord.js';
+import {
+  SlashCommandBuilder,
+  CommandInteraction,
+  CacheType,
+  Role,
+  GuildMember,
+  PermissionsBitField,
+} from "discord.js";
 
 let djMode = false;
 let djRole: Role | null = null;
 
 const djmodeCommand = {
   data: new SlashCommandBuilder()
-    .setName('djmode')
-    .setDescription('Toggle DJ Mode on or off and set the DJ role')
-    .addBooleanOption(option =>
-      option.setName('status')
-        .setDescription('Turn DJ Mode on or off')
+    .setName("djmode")
+    .setDescription("Toggle DJ Mode on or off and set the DJ role")
+    .addBooleanOption((option) =>
+      option
+        .setName("status")
+        .setDescription("Turn DJ Mode on or off")
         .setRequired(true)
     )
-    .addRoleOption(option =>
-      option.setName('role')
-        .setDescription('The DJ role')
-        .setRequired(true)
+    .addRoleOption((option) =>
+      option.setName("role").setDescription("The DJ role").setRequired(true)
     ),
 
   async execute(interaction: CommandInteraction<CacheType>) {
-    if (!interaction.memberPermissions?.has(PermissionsBitField.Flags.BanMembers)) {
-      return interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true });
+    if (
+      !interaction.memberPermissions?.has(PermissionsBitField.Flags.BanMembers)
+    ) {
+      return interaction.reply({
+        content: "You do not have permission to use this command.",
+        ephemeral: true,
+      });
     }
 
-    const status = interaction.options.get('status')?.value as boolean;
-    const role = interaction.options.get('role')?.role as Role;
+    const status = interaction.options.get("status")?.value as boolean;
+    const role = interaction.options.get("role")?.role as Role;
 
     if (!role || !interaction.guild) {
-      return interaction.reply('You need to provide a valid role.');
+      return interaction.reply("You need to provide a valid role.");
     }
 
     djMode = status;
     djRole = role;
 
-    return interaction.reply(`DJ Mode is now ${djMode ? 'enabled' : 'disabled'} with the role ${djRole.name}`);
+    return interaction.reply(
+      `DJ Mode is now ${djMode ? "enabled" : "disabled"} with the role ${
+        djRole.name
+      }`
+    );
   },
 
   checkDJ(interaction: CommandInteraction): boolean {
@@ -43,8 +58,8 @@ const djmodeCommand = {
     if (!member || !member.roles) return false;
 
     const memberRoles = member.roles;
-    return 'cache' in memberRoles && memberRoles.cache.has(djRole?.id || '');
-  }
+    return "cache" in memberRoles && memberRoles.cache.has(djRole?.id || "");
+  },
 };
 
 export { djmodeCommand, djMode, djRole };
