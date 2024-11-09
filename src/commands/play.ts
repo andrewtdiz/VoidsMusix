@@ -24,6 +24,7 @@ function getConnection(
   const guild = interaction.guild;
 
   if (!member || !("voice" in member) || !member.voice.channel || !guild) {
+    console.log("Invalid member.");
     return null;
   }
 
