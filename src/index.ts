@@ -185,5 +185,6 @@ export async function playNextSong(connection: VoiceConnection) {
     playNextSong(connection);
   });
 
+  //@ts-ignore
   if (idleTimeout) clearTimeout(idleTimeout);
 }
