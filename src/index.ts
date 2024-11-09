@@ -1,18 +1,26 @@
-import { Client, GatewayIntentBits, Interaction } from 'discord.js';
-import { createAudioPlayer, AudioPlayerStatus, createAudioResource, AudioPlayer, AudioResource, StreamType, VoiceConnection } from '@discordjs/voice';
-import { config } from 'dotenv';
-import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
-import playCommand from './commands/play';
-import pauseCommand from './commands/pause';
-import resumeCommand from './commands/resume';
-import queueCommand from './commands/queue';
-import stopCommand from './commands/stop';
-import skipCommand from './commands/skip';
-import pingCommand from './commands/ping';
+import { Client, GatewayIntentBits, Interaction } from "discord.js";
+import {
+  createAudioPlayer,
+  AudioPlayerStatus,
+  createAudioResource,
+  AudioPlayer,
+  AudioResource,
+  StreamType,
+  VoiceConnection,
+} from "@discordjs/voice";
+import { config } from "dotenv";
+import { REST } from "@discordjs/rest";
+import { Routes } from "discord-api-types/v9";
+import playCommand from "./commands/play";
+import pauseCommand from "./commands/pause";
+import resumeCommand from "./commands/resume";
+import queueCommand from "./commands/queue";
+import stopCommand from "./commands/stop";
+import skipCommand from "./commands/skip";
+import pingCommand from "./commands/ping";
 
-import { djmodeCommand } from './commands/djmode';
-import { spawn } from 'child_process';
+import { djmodeCommand } from "./commands/djmode";
+import { spawn } from "child_process";
 
 config();
 
@@ -39,62 +47,73 @@ export function setConnection(newConnection: VoiceConnection) {
 }
 
 const commands = [
-  playCommand, pauseCommand, resumeCommand, queueCommand, stopCommand, skipCommand, djmodeCommand, pingCommand
+  playCommand,
+  pauseCommand,
+  resumeCommand,
+  queueCommand,
+  stopCommand,
+  skipCommand,
+  djmodeCommand,
+  pingCommand,
 ];
 
-client.once('ready', () => {
+client.once("ready", () => {
   console.log(`Logged in as ${client.user?.tag}!`);
 });
 
-client.on('interactionCreate', async (interaction: Interaction) => {
+client.on("interactionCreate", async (interaction: Interaction) => {
   if (!interaction.isCommand()) return;
 
   const { commandName } = interaction;
 
   if (!djmodeCommand.checkDJ(interaction)) {
-    return interaction.reply('DJ Mode is enabled, and you don\'t have the required DJ role to use this command.');
+    return interaction.reply(
+      "DJ Mode is enabled, and you don't have the required DJ role to use this command."
+    );
   }
 
   switch (commandName) {
-    case 'play':
+    case "play":
       await playCommand.execute(interaction);
       break;
-    case 'pause':
+    case "pause":
       await pauseCommand.execute(interaction);
       break;
-    case 'resume':
+    case "resume":
       await resumeCommand.execute(interaction);
       break;
-    case 'queue':
+    case "queue":
       await queueCommand.execute(interaction);
       break;
-    case 'skip':
+    case "skip":
       await skipCommand.execute(interaction);
       break;
-    case 'stop':
+    case "stop":
       await stopCommand.execute(interaction);
       break;
-    case 'djmode':
+    case "djmode":
       await djmodeCommand.execute(interaction);
       break;
-    case 'ping':
+    case "ping":
       await pingCommand.execute(interaction);
       break;
   }
 });
 
-const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN as string);
+const rest = new REST({ version: "10" }).setToken(
+  process.env.DISCORD_TOKEN as string
+);
 
 (async () => {
   try {
-    console.log('Started refreshing application (/) commands.');
+    console.log("Started refreshing application (/) commands.");
 
     await rest.put(
       Routes.applicationCommands(process.env.CLIENT_ID as string),
-      { body: commands.map(command => command.data) },
+      { body: commands.map((command) => command.data) }
     );
 
-    console.log('Successfully reloaded application (/) commands.');
+    console.log("Successfully reloaded application (/) commands.");
   } catch (error) {
     console.error(error);
   }
@@ -105,6 +124,7 @@ client.login(process.env.DISCORD_TOKEN);
 export let playbackStartTime: number | null = null;
 
 function leaveVoiceChannelAfterTimeout() {
+  //@ts-ignore
   if (idleTimeout) clearTimeout(idleTimeout);
 
   idleTimeout = setTimeout(() => {
@@ -125,15 +145,17 @@ export async function playNextSong(connection: VoiceConnection) {
   const song = queue.shift()!;
   setCurrentSong(song);
 
-  const process = spawn('yt-dlp', [
-    '-o', '-',
-    '-f', 'bestaudio',
-    '--quiet',
-    '--no-warnings',
+  const process = spawn("yt-dlp", [
+    "-o",
+    "-",
+    "-f",
+    "bestaudio",
+    "--quiet",
+    "--no-warnings",
     song.url,
   ]);
 
-  process.on('error', (error) => {
+  process.on("error", (error) => {
     console.error(`Error spawning yt-dlp: ${error.message}`);
     playNextSong(connection);
   });
@@ -147,7 +169,7 @@ export async function playNextSong(connection: VoiceConnection) {
 
   playbackStartTime = Date.now();
 
-  process.on('exit', (code) => {
+  process.on("exit", (code) => {
     if (code !== 0) {
       console.error(`yt-dlp exited with code ${code}. Skipping this song.`);
       playNextSong(connection);
@@ -158,8 +180,8 @@ export async function playNextSong(connection: VoiceConnection) {
     playNextSong(connection);
   });
 
-  audioPlayer.on('error', (error) => {
-    console.error('Audio player error:', error);
+  audioPlayer.on("error", (error) => {
+    console.error("Audio player error:", error);
     playNextSong(connection);
   });
 
