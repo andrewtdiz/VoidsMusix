@@ -1,9 +1,4 @@
-import {
-  SlashCommandBuilder,
-  CommandInteraction,
-  CacheType,
-  GuildMember,
-} from "discord.js";
+import { SlashCommandBuilder, CommandInteraction, CacheType } from "discord.js";
 import { getVoiceConnection } from "@discordjs/voice";
 import { queue, audioPlayer, setCurrentSong } from "../index";
 import { logAction } from "../utils/logAction";
