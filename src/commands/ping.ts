@@ -17,7 +17,7 @@ export default {
     const apiLatency = Math.round(interaction.client.ws.ping);
 
     await interaction.editReply({
-      content: `Latency: **${latency}ms**\nAPI Latency: **${apiLatency}ms**\n*v1.02*`,
+      content: `Latency: **${latency}ms**\nAPI Latency: **${apiLatency}ms**\n*v1.03*`,
     });
 
     logAction(
