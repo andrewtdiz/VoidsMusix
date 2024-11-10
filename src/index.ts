@@ -46,6 +46,7 @@ export function setConnection(newConnection: VoiceConnection) {
   connection = newConnection;
 }
 
+// all commands
 const commands = [
   playCommand,
   pauseCommand,
