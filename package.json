@@ -4,9 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "start": "ts-node src/index.ts",
-    "start:prod": "node dist/index.js"
+    "build": "bun run tsc",
+    "dev": "bun run src/index.ts",
+    "start": "bun run dist/index.js"
   },
   "keywords": [],
   "author": "",
