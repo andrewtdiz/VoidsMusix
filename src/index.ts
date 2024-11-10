@@ -132,7 +132,7 @@ function leaveVoiceChannelAfterTimeout() {
       connection.disconnect();
       connection = null;
     }
-  }, 60 * 1000);
+  }, 300 * 1000);
 }
 
 export async function playNextSong(connection: VoiceConnection) {
