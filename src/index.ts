@@ -57,10 +57,6 @@ const commands = [
   pingCommand,
 ];
 
-client.once("ready", () => {
-  console.log(`Logged in as ${client.user?.tag}!`);
-});
-
 client.on("interactionCreate", async (interaction: Interaction) => {
   if (!interaction.isCommand()) return;
 
@@ -72,31 +68,10 @@ client.on("interactionCreate", async (interaction: Interaction) => {
     );
   }
 
-  switch (commandName) {
-    case "play":
-      await playCommand.execute(interaction);
-      break;
-    case "pause":
-      await pauseCommand.execute(interaction);
-      break;
-    case "resume":
-      await resumeCommand.execute(interaction);
-      break;
-    case "queue":
-      await queueCommand.execute(interaction);
-      break;
-    case "skip":
-      await skipCommand.execute(interaction);
-      break;
-    case "stop":
-      await stopCommand.execute(interaction);
-      break;
-    case "djmode":
-      await djmodeCommand.execute(interaction);
-      break;
-    case "ping":
-      await pingCommand.execute(interaction);
-      break;
+  for (const command of commands) {
+    if (command.data.name === commandName) {
+      await command.execute(interaction);
+    }
   }
 });
 
@@ -120,6 +95,10 @@ const rest = new REST({ version: "10" }).setToken(
 })();
 
 client.login(process.env.DISCORD_TOKEN);
+
+client.once("ready", () => {
+  console.log(`Logged in as ${client.user?.tag}!`);
+});
 
 export let playbackStartTime: number | null = null;
 
