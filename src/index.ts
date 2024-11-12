@@ -66,7 +66,7 @@ app.post("/", async (req: Request, res: Response) => {
     if (!data.command) return;
 
     const { command: commandName } = data;
-    
+
     let result = null;
     for (const command of commands) {
       if (command.data.name === commandName) {
@@ -88,14 +88,6 @@ const rest = new REST({ version: "10" }).setToken(
 
 (async () => {
   try {
-    console.log("Started refreshing application (/) commands.");
-
-    await rest.put(
-      Routes.applicationCommands(process.env.CLIENT_ID as string),
-      { body: commands.map((command) => command.data) }
-    );
-
-    console.log("Successfully reloaded application (/) commands.");
   } catch (error) {
     console.error(error);
   }
