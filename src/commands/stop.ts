@@ -12,11 +12,13 @@ const stopCommand = {
   async execute(data: Record<string, any>) {
     const connection = getVoiceConnection(data.guildId);
 
+    if (!connection) return "No Connection.";
+
     queue.length = 0;
     setCurrentSong(null);
     audioPlayer.stop();
 
-    connection?.destroy();
+    connection.destroy();
 
     return "Stopped the music and cleared the queue.";
   },
