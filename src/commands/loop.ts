@@ -1,7 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
-import { audioPlayer, currentSong } from "../index";
-import { AudioPlayerStatus } from "@discordjs/voice";
-import { looping, toggleLooping } from "../utils/looping";
+import { getLooping, toggleLooping } from "../utils/looping";
 
 export default {
   data: new SlashCommandBuilder()
@@ -11,6 +9,6 @@ export default {
   async execute(data: Record<string, any>) {
     toggleLooping();
 
-    return `Looping has been set to: \`${looping}\``;
+    return `Looping has been set to: \`${getLooping()}\``;
   },
 };

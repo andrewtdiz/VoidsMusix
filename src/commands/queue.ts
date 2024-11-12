@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, CommandInteraction, CacheType } from "discord.js";
 import { queue, currentSong, playbackStartTime } from "../index";
 import play from "play-dl";
-import { looping } from "../utils/looping";
+import { getLooping } from "../utils/looping";
 
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
@@ -36,9 +36,9 @@ const queueCommand = {
       }
 
       const currentSongMessage = currentSong
-        ? `Currently playing: **${currentSong.title}**\n ${
-            looping ? " (looping)" : ""
-          }`
+        ? `Currently playing: **${currentSong.title}**${
+            getLooping() ? " (looping)" : ""
+          }\n`
         : "Nothing is currently playing.\n";
 
       const queueMessage =

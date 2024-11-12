@@ -1,5 +1,7 @@
-export let looping = false;
+let looping = false;
 
 export function toggleLooping() {
-    looping = !looping;
+  looping = !looping;
 }
+
+export const getLooping = () => looping;
