@@ -4,7 +4,13 @@ import {
   AudioPlayerStatus,
   VoiceConnection,
 } from "@discordjs/voice";
-import { queue, playNextSong, audioPlayer, setConnection } from "../index";
+import {
+  queue,
+  playNextSong,
+  audioPlayer,
+  setConnection,
+  client,
+} from "../index";
 import play from "play-dl";
 import { logAction } from "../utils/logAction";
 import { isInSameVoiceChannelAsBot } from "../utils/isInSameVoiceChannelAsBot";
@@ -69,6 +75,22 @@ const playCommand = {
         title: video.title || "Unknown Title",
         url: video.url,
       };
+
+      const guild = client.guilds.cache.get(data.guildId);
+      if (!guild) {
+        return "Could not find the guild.";
+      }
+
+      const voiceChannelId = data.voiceChannelId;
+      if (!voiceChannelId) {
+        return "Could not find the voice channel.";
+      }
+
+      const connection = joinVoiceChannel({
+        channelId: voiceChannelId,
+        guildId: guild.id,
+        adapterCreator: guild.voiceAdapterCreator,
+      });
 
       queue.push(song);
 
