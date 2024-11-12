@@ -49,8 +49,19 @@ export function setCurrentSong(song: Song | null) {
   currentSong = song;
 }
 
+export function getConnection() {
+  return connection;
+}  
+
 export function setConnection(newConnection: VoiceConnection) {
   connection = newConnection;
+}
+
+export function destroyConnection() {
+  if (connection === null) return;
+
+  connection.destroy();
+  connection = null;
 }
 
 const commands = [
@@ -118,8 +129,7 @@ function leaveVoiceChannelAfterTimeout() {
 
   idleTimeout = setTimeout(() => {
     if (connection) {
-      connection.disconnect();
-      connection = null;
+      destroyConnection();
     }
   }, 300 * 1000);
 }

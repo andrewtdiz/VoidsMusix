@@ -1,6 +1,11 @@
 import { SlashCommandBuilder, CommandInteraction, CacheType } from "discord.js";
 import { getVoiceConnection } from "@discordjs/voice";
-import { queue, audioPlayer, setCurrentSong } from "../index";
+import {
+  queue,
+  audioPlayer,
+  setCurrentSong,
+  destroyConnection,
+} from "../index";
 import { logAction } from "../utils/logAction";
 import { isInSameVoiceChannelAsBot } from "../utils/isInSameVoiceChannelAsBot";
 
@@ -18,7 +23,7 @@ const stopCommand = {
     setCurrentSong(null);
     audioPlayer.stop();
 
-    connection.destroy();
+    destroyConnection();
 
     return "Stopped the music and cleared the queue.";
   },

@@ -4,8 +4,8 @@ import {
   queue,
   playNextSong,
   setCurrentSong,
-  connection,
-  client,
+  destroyConnection,
+  getConnection,
 } from "../index";
 import { logAction } from "../utils/logAction";
 import { isInSameVoiceChannelAsBot } from "../utils/isInSameVoiceChannelAsBot";
@@ -16,6 +16,7 @@ const skipCommand = {
     .setDescription("Skip the currently playing song"),
 
   async execute(data: Record<string, any>) {
+    const connection = getConnection();
     if (!connection) {
       setCurrentSong(null);
       return "No active voice connection.";
@@ -23,7 +24,7 @@ const skipCommand = {
 
     if (queue.length === 0) {
       audioPlayer.stop();
-      connection.destroy();
+      destroyConnection;
 
       return "Skipped the current song";
     }

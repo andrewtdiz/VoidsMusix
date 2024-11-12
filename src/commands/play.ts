@@ -92,6 +92,8 @@ const playCommand = {
         adapterCreator: guild.voiceAdapterCreator,
       });
 
+      setConnection(connection);
+
       queue.push(song);
       if (audioPlayer.state.status !== AudioPlayerStatus.Playing) {
         playNextSong(connection);
