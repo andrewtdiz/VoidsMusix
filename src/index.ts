@@ -18,6 +18,7 @@ import resumeCommand from "./commands/resume";
 import queueCommand from "./commands/queue";
 import stopCommand from "./commands/stop";
 import skipCommand from "./commands/skip";
+import loopCommand from "./commands/loop";
 
 import { spawn } from "child_process";
 import { looping } from "./utils/looping";
@@ -55,6 +56,7 @@ export function setConnection(newConnection: VoiceConnection) {
 const commands = [
   playCommand,
   pauseCommand,
+  loopCommand,
   resumeCommand,
   queueCommand,
   stopCommand,
