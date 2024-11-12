@@ -21,7 +21,6 @@ import skipCommand from "./commands/skip";
 import loopCommand from "./commands/loop";
 
 import { spawn } from "child_process";
-import { looping } from "./utils/looping";
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -166,9 +165,6 @@ export async function playNextSong(connection: VoiceConnection) {
   });
 
   audioPlayer.once(AudioPlayerStatus.Idle, () => {
-    if (looping) {
-      queue.unshift(song);
-    }
     playNextSong(connection);
   });
 

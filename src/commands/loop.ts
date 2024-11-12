@@ -12,7 +12,7 @@ export default {
     if (audioPlayer.state.status === AudioPlayerStatus.Playing && currentSong) {
       toggleLooping();
 
-      return `Looping has been set to: ${looping}`;
+      return `Looping has been set to: \`${looping}\``;
     } else {
       return "No song is currently playing.";
     }
