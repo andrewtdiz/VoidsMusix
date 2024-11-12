@@ -10,7 +10,7 @@ const stopCommand = {
     .setDescription("Stop the music and clear the queue"),
 
   async execute(data: Record<string, any>) {
-    const connection = getVoiceConnection(data.guidId);
+    const connection = getVoiceConnection(data.guildId);
 
     queue.length = 0;
     setCurrentSong(null);
