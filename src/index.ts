@@ -20,6 +20,7 @@ import stopCommand from "./commands/stop";
 import skipCommand from "./commands/skip";
 import loopCommand from "./commands/loop";
 
+import { looping } from "./utils/looping";
 import { spawn } from "child_process";
 
 const app: Express = express();
@@ -165,6 +166,9 @@ export async function playNextSong(connection: VoiceConnection) {
   });
 
   audioPlayer.once(AudioPlayerStatus.Idle, () => {
+    if (looping) {
+      queue.unshift(song);
+    }
     playNextSong(connection);
   });
 
