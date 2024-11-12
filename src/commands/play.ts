@@ -93,6 +93,9 @@ const playCommand = {
       });
 
       queue.push(song);
+      if (audioPlayer.state.status !== AudioPlayerStatus.Playing) {
+        playNextSong(connection);
+      }
 
       return `Added **${song.title}** to the queue! Duration: ${durationFormatted}`;
     } catch (error) {
