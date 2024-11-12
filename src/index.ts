@@ -82,13 +82,6 @@ app.post("/", async (req: Request, res: Response) => {
   }
 });
 
-(async () => {
-  try {
-  } catch (error) {
-    console.error(error);
-  }
-})();
-
 client.login(process.env.DISCORD_TOKEN);
 
 client.once("ready", () => {
@@ -162,3 +155,7 @@ export async function playNextSong(connection: VoiceConnection) {
   //@ts-ignore
   if (idleTimeout) clearTimeout(idleTimeout);
 }
+
+app.listen(port, () => {
+  console.log(`[server]: Server is running at http://localhost:${port}`);
+});
