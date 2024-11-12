@@ -82,10 +82,6 @@ app.post("/", async (req: Request, res: Response) => {
   }
 });
 
-const rest = new REST({ version: "10" }).setToken(
-  process.env.DISCORD_TOKEN as string
-);
-
 (async () => {
   try {
   } catch (error) {
