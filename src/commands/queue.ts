@@ -48,7 +48,7 @@ const queueCommand = {
       return remainingTimeMessage + currentSongMessage + queueMessage;
     };
 
-    updateMessage();
+    return updateMessage();
   },
 };
 
