@@ -9,12 +9,8 @@ export default {
     .setDescription("Loops the current song"),
 
   async execute(data: Record<string, any>) {
-    if (audioPlayer.state.status === AudioPlayerStatus.Playing && currentSong) {
-      toggleLooping();
+    toggleLooping();
 
-      return `Looping has been set to: \`${looping}\``;
-    } else {
-      return "No song is currently playing.";
-    }
+    return `Looping has been set to: \`${looping}\``;
   },
 };
