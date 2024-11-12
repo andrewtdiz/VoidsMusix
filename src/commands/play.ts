@@ -46,22 +46,15 @@ const playCommand = {
         .setRequired(true)
     ),
 
-  async execute(interaction: CommandInteraction<CacheType>) {
+  async execute(data: Record<string, any>) {
     try {
-      await interaction.deferReply();
-
-      const query = interaction.options.get("query")?.value as string;
+      const query = data.query;
+      if (!query) return "No results found for your query.";
       const searchResult = await play.search(query, { limit: 1 });
       const video = searchResult[0];
 
       if (!video) {
-        return interaction.editReply("No results found for your query.");
-      }
-
-      if (!isInSameVoiceChannelAsBot(interaction)) {
-        return interaction.editReply(
-          "You need to be in the same voice channel as the bot to play music!"
-        );
+        return "No results found for your query.";
       }
 
       const songInfo = await play.video_info(video.url);
@@ -69,20 +62,8 @@ const playCommand = {
       const durationFormatted = formatTime(durationInSeconds);
 
       if (durationInSeconds > 60 * 10) {
-        return interaction.editReply(
-          `This song is longer than 10 minutes (${durationFormatted}). Please choose a shorter song.`
-        );
+        return `This song is longer than 10 minutes (${durationFormatted}). Please choose a shorter song.`;
       }
-
-      const connection = getConnection(interaction);
-
-      if (!connection) {
-        return interaction.editReply(
-          "You need to be in a voice channel to play music!"
-        );
-      }
-
-      setConnection(connection);
 
       const song = {
         title: video.title || "Unknown Title",
@@ -90,36 +71,11 @@ const playCommand = {
       };
 
       queue.push(song);
-      await interaction.editReply(
-        `Added **${song.title}** to the queue! Duration: ${durationFormatted}`
-      );
 
-      logAction(
-        interaction.client,
-        "Play",
-        `Added ${song.title} to the queue.`,
-        interaction.user,
-        song.url
-      );
-
-      if (audioPlayer.state.status !== AudioPlayerStatus.Playing) {
-        playNextSong(connection);
-      }
+      return `Added **${song.title}** to the queue! Duration: ${durationFormatted}`;
     } catch (error) {
       console.error("Error handling play command:", error);
-      try {
-        if (interaction.deferred) {
-          await interaction.editReply(
-            "There was an error trying to execute this command!"
-          );
-        } else {
-          await interaction.reply(
-            "There was an error trying to execute this command!"
-          );
-        }
-      } catch (replyError) {
-        console.error("Error sending reply:", replyError);
-      }
+      return "There was an error trying to execute this command!";
     }
   },
 };

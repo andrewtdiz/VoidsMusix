@@ -12,14 +12,7 @@ export default {
     .setName("pause")
     .setDescription("Pause the current song"),
 
-  async execute(interaction: CommandInteraction) {
-    if (!isInSameVoiceChannelAsBot(interaction)) {
-      return interaction.reply({
-        content:
-          "You need to be in the same voice channel as the bot to stop the music!",
-      });
-    }
-
+  async execute(data: Record<string, any>) {
     if (audioPlayer.state.status === AudioPlayerStatus.Playing && currentSong) {
       audioPlayer.pause();
 
@@ -34,19 +27,9 @@ export default {
         .toISOString()
         .substr(11, 8);
 
-      await interaction.reply(
-        `Paused the current song. Time left: ${remainingFormatted}`
-      );
-
-      logAction(
-        client,
-        "Pause",
-        `Paused at ${remainingFormatted} remaining`,
-        interaction.user,
-        currentSong.url
-      );
+      return `Paused the current song. Time left: ${remainingFormatted}`;
     } else {
-      await interaction.reply("No song is currently playing.");
+      return "No song is currently playing.";
     }
   },
 };

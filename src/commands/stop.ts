@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, CommandInteraction, CacheType } from "discord.js";
 import { getVoiceConnection } from "@discordjs/voice";
-import { queue, audioPlayer, setCurrentSong } from "../index";
+import { queue, audioPlayer, setCurrentSong, connection } from "../index";
 import { logAction } from "../utils/logAction";
 import { isInSameVoiceChannelAsBot } from "../utils/isInSameVoiceChannelAsBot";
 
@@ -9,40 +9,14 @@ const stopCommand = {
     .setName("stop")
     .setDescription("Stop the music and clear the queue"),
 
-  async execute(interaction: CommandInteraction<CacheType>) {
-    const connection = getVoiceConnection(interaction.guild!.id);
-
-    if (!connection) {
-      return interaction.reply({
-        content: "The bot is not in a voice channel!",
-        ephemeral: true,
-      });
-    }
-
-    if (!isInSameVoiceChannelAsBot(interaction)) {
-      return interaction.reply({
-        content:
-          "You need to be in the same voice channel as the bot to stop the music!",
-      });
-    }
-
-    await interaction.deferReply();
-
+  async execute(data: Record<string, any>) {
     queue.length = 0;
     setCurrentSong(null);
     audioPlayer.stop();
 
-    connection.destroy();
+    connection?.destroy();
 
-    await interaction.editReply("Stopped the music and cleared the queue.");
-
-    logAction(
-      interaction.client,
-      "Stop",
-      `${interaction.user.tag} stopped the music and cleared the queue.`,
-      interaction.user,
-      ""
-    );
+    return "Stopped the music and cleared the queue.";
   },
 };
 

@@ -9,26 +9,12 @@ export default {
     .setName("resume")
     .setDescription("Resume the paused song"),
 
-  async execute(interaction: CommandInteraction) {
-    if (!isInSameVoiceChannelAsBot(interaction)) {
-      return interaction.reply({
-        content:
-          "You need to be in the same voice channel as the bot to stop the music!",
-      });
-    }
+  async execute(data: Record<string, any>) {
     if (audioPlayer.state.status === AudioPlayerStatus.Paused && currentSong) {
       audioPlayer.unpause();
-      await interaction.reply("Resumed the current song.");
-
-      logAction(
-        client,
-        "Resume",
-        "Resumed the song",
-        interaction.user,
-        currentSong.url
-      );
+      return "Resumed the current song.";
     } else {
-      await interaction.reply("No song is currently paused.");
+      return "No song is currently paused.";
     }
   },
 };

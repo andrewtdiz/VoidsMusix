@@ -1,4 +1,5 @@
 import { Client, GatewayIntentBits, Interaction } from "discord.js";
+import express, { Express, Request, Response } from "express";
 import {
   createAudioPlayer,
   AudioPlayerStatus,
@@ -17,10 +18,14 @@ import resumeCommand from "./commands/resume";
 import queueCommand from "./commands/queue";
 import stopCommand from "./commands/stop";
 import skipCommand from "./commands/skip";
-import pingCommand from "./commands/ping";
 
-import { djmodeCommand } from "./commands/djmode";
 import { spawn } from "child_process";
+
+const app: Express = express();
+const port = process.env.PORT || 3000;
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 config();
 
@@ -46,7 +51,6 @@ export function setConnection(newConnection: VoiceConnection) {
   connection = newConnection;
 }
 
-// all commands
 const commands = [
   playCommand,
   pauseCommand,
@@ -54,25 +58,27 @@ const commands = [
   queueCommand,
   stopCommand,
   skipCommand,
-  djmodeCommand,
-  pingCommand,
 ];
 
-client.on("interactionCreate", async (interaction: Interaction) => {
-  if (!interaction.isCommand()) return;
+app.post("/", async (req: Request, res: Response) => {
+  try {
+    const data = req.body;
+    if (!data.command) return;
 
-  const { commandName } = interaction;
-
-  if (!djmodeCommand.checkDJ(interaction)) {
-    return interaction.reply(
-      "DJ Mode is enabled, and you don't have the required DJ role to use this command."
-    );
-  }
-
-  for (const command of commands) {
-    if (command.data.name === commandName) {
-      await command.execute(interaction);
+    const { command: commandName } = data;
+    
+    let result = null;
+    for (const command of commands) {
+      if (command.data.name === commandName) {
+        result = await command.execute(data);
+        break;
+      }
     }
+
+    res.send(JSON.stringify({ result }));
+  } catch (error) {
+    console.error("Error handling webhook:", error);
+    res.status(500).send("Internal server error");
   }
 });
 

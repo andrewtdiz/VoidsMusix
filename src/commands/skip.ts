@@ -15,30 +15,17 @@ const skipCommand = {
     .setName("skip")
     .setDescription("Skip the currently playing song"),
 
-  async execute(interaction: CommandInteraction<CacheType>) {
+  async execute(data: Record<string, any>) {
     if (!connection) {
       setCurrentSong(null);
-      return interaction.reply("No active voice connection.");
-    }
-
-    if (!isInSameVoiceChannelAsBot(interaction)) {
-      return interaction.reply({
-        content:
-          "You need to be in the same voice channel as the bot to stop the music!",
-      });
+      return "No active voice connection.";
     }
 
     if (queue.length === 0) {
       audioPlayer.stop();
       connection.destroy();
-      logAction(
-        client,
-        "Skip",
-        "No song to play next",
-        interaction.user,
-        "N/A"
-      );
-      return interaction.reply("Skipped the current song");
+
+      return "Skipped the current song";
     }
 
     audioPlayer.stop();
@@ -48,22 +35,13 @@ const skipCommand = {
       const nextSong = queue[0];
 
       if (nextSong) {
-        logAction(
-          client,
-          "Skip",
-          `Skipped to ${nextSong.title}`,
-          interaction.user,
-          nextSong.url
-        );
-        return interaction.reply(
-          `Skipped the current song. Now playing **${nextSong.title}**.`
-        );
+        return `Skipped the current song. Now playing **${nextSong.title}**.`;
       }
     }
 
     setCurrentSong(null);
-    logAction(client, "Skip", "Skipped current song", interaction.user, "N/A");
-    return interaction.reply("Skipped the current song");
+
+    return "Skipped the current song";
   },
 };
 
