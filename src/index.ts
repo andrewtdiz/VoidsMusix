@@ -19,6 +19,7 @@ import queueCommand from "./commands/queue";
 import stopCommand from "./commands/stop";
 import skipCommand from "./commands/skip";
 import loopCommand from "./commands/loop";
+import removeCommand from "./commands/remove";
 
 import { getLooping } from "./utils/looping";
 import { spawn } from "child_process";
@@ -51,7 +52,7 @@ export function setCurrentSong(song: Song | null) {
 
 export function getConnection() {
   return connection;
-}  
+}
 
 export function setConnection(newConnection: VoiceConnection) {
   connection = newConnection;
@@ -68,6 +69,7 @@ const commands = [
   playCommand,
   pauseCommand,
   loopCommand,
+  removeCommand,
   resumeCommand,
   queueCommand,
   stopCommand,
