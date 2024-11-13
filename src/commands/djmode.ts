@@ -11,18 +11,7 @@ let djMode = false;
 let djRole: Role | null = null;
 
 const djmodeCommand = {
-  data: new SlashCommandBuilder()
-    .setName("djmode")
-    .setDescription("Toggle DJ Mode on or off and set the DJ role")
-    .addBooleanOption((option) =>
-      option
-        .setName("status")
-        .setDescription("Turn DJ Mode on or off")
-        .setRequired(true)
-    )
-    .addRoleOption((option) =>
-      option.setName("role").setDescription("The DJ role").setRequired(true)
-    ),
+  name: "djmode",
 
   async execute(interaction: CommandInteraction<CacheType>) {
     if (

@@ -5,9 +5,7 @@ import { logAction } from "../utils/logAction";
 import { isInSameVoiceChannelAsBot } from "../utils/isInSameVoiceChannelAsBot";
 
 export default {
-  data: new SlashCommandBuilder()
-    .setName("resume")
-    .setDescription("Resume the paused song"),
+  name: "resume",
 
   async execute(data: Record<string, any>) {
     if (audioPlayer.state.status === AudioPlayerStatus.Paused && currentSong) {

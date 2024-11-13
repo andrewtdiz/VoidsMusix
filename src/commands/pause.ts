@@ -8,9 +8,7 @@ import { isInSameVoiceChannelAsBot } from "../utils/isInSameVoiceChannelAsBot";
 let playbackStartTime: number | null = null;
 
 export default {
-  data: new SlashCommandBuilder()
-    .setName("pause")
-    .setDescription("Pause the current song"),
+  name: "pause",
 
   async execute(data: Record<string, any>) {
     if (audioPlayer.state.status === AudioPlayerStatus.Playing && currentSong) {

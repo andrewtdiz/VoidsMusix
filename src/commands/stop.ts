@@ -10,9 +10,7 @@ import { logAction } from "../utils/logAction";
 import { isInSameVoiceChannelAsBot } from "../utils/isInSameVoiceChannelAsBot";
 
 const stopCommand = {
-  data: new SlashCommandBuilder()
-    .setName("stop")
-    .setDescription("Stop the music and clear the queue"),
+  name: "stop",
 
   async execute(data: Record<string, any>) {
     const connection = getVoiceConnection(data.guildId);

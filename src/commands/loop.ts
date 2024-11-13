@@ -2,9 +2,7 @@ import { SlashCommandBuilder } from "discord.js";
 import { getLooping, toggleLooping } from "../utils/looping";
 
 export default {
-  data: new SlashCommandBuilder()
-    .setName("loop")
-    .setDescription("Loops the current song"),
+  name: "loop",
 
   async execute(data: Record<string, any>) {
     toggleLooping();

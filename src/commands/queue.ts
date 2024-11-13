@@ -10,9 +10,7 @@ function formatTime(seconds: number): string {
 }
 
 const queueCommand = {
-  data: new SlashCommandBuilder()
-    .setName("queue")
-    .setDescription("Shows the current song and the queue of upcoming songs"),
+  name: "queue",
 
   async execute(data: Record<string, any>) {
     if (!currentSong && queue.length === 0) {

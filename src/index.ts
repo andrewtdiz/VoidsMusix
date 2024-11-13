@@ -85,7 +85,7 @@ app.post("/", async (req: Request, res: Response) => {
 
     let result = null;
     for (const command of commands) {
-      if (command.data.name === commandName) {
+      if (command.name === commandName) {
         result = await command.execute(data);
         break;
       }

@@ -11,9 +11,7 @@ import { logAction } from "../utils/logAction";
 import { isInSameVoiceChannelAsBot } from "../utils/isInSameVoiceChannelAsBot";
 
 const skipCommand = {
-  data: new SlashCommandBuilder()
-    .setName("skip")
-    .setDescription("Skip the currently playing song"),
+  name: "skip",
 
   async execute(data: Record<string, any>) {
     const connection = getConnection();

@@ -15,9 +15,7 @@ function removeAtIndex<T>(array: T[], index: number): T | null {
 }
 
 const removeCommand = {
-  data: new SlashCommandBuilder()
-    .setName("remove")
-    .setDescription("Remove a song from the list"),
+  name: "remove",
 
   async execute(data: Record<string, any>) {
     const index = Number(data?.index || -1);

@@ -41,15 +41,7 @@ function getConnection(
 }
 
 const playCommand = {
-  data: new SlashCommandBuilder()
-    .setName("play")
-    .setDescription("Search for a song on YouTube and play it")
-    .addStringOption((option) =>
-      option
-        .setName("query")
-        .setDescription("The search query to find the song")
-        .setRequired(true)
-    ),
+  name: "play",
 
   async execute(data: Record<string, any>) {
     try {
