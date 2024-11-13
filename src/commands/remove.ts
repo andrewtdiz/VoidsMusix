@@ -22,7 +22,7 @@ const removeCommand = {
   async execute(data: Record<string, any>) {
     console.log("REMOVE COMMAND");
 
-    const index = data.index;
+    const index = Number(data?.index || -1);
 
     const connection = getConnection();
     if (!connection) {
@@ -39,7 +39,7 @@ const removeCommand = {
     if (typeof index !== "number") {
       return `Invalid index ${index}`;
     }
-    if (index > queue.length) {
+    if (index > queue.length || index < 0) {
       return `Invalid index ${index}, queue length ${queue.length}`;
     }
 
