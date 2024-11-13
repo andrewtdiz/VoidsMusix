@@ -36,7 +36,7 @@ const removeCommand = {
 
     console.log(index, queue.length);
 
-    if (!index || typeof index !== "number") {
+    if (typeof index !== "number") {
       return `Invalid index ${index}`;
     }
     if (index > queue.length) {
