@@ -44,7 +44,7 @@ const removeCommand = {
     }
 
     if (queue.length > 0) {
-      const removedSong = removeAtIndex(queue, index + 1);
+      const removedSong = removeAtIndex(queue, index - 1);
 
       if (removedSong) {
         return `Removed the current song at index **${index}**: **${removedSong.title}**.`;
