@@ -14,7 +14,7 @@ const disallowList =
     "politics", "populism", "president", "prime minister", "progressives", "protests", "proud boys", "QAnon",
     "Recep Erdogan", "referendum", "reform", "republican", "republicans", "revolution", "right-wing", "immigrants", "deport", "deportation",
     "Ron DeSantis", "sedition", "senate", "socialism", "socialist party", "Supreme Court", "taxation", "Ted Cruz",
-    "Vladimir Putin", "vote", "voting", "welfare", "Xi Jinping"
+    "Vladimir Putin", "vote", "voting", "welfare", "Ben Shapiro", "Xi Jinping"
 ];
 
 export default function(songTitle: string) {
