@@ -20,8 +20,6 @@ const removeCommand = {
     .setDescription("Remove a song from the list"),
 
   async execute(data: Record<string, any>) {
-    console.log("REMOVE COMMAND");
-
     const index = Number(data?.index || -1);
 
     const connection = getConnection();
@@ -31,10 +29,8 @@ const removeCommand = {
     }
 
     if (queue.length === 0) {
-      return "No song to skip";
+      return "No song in the queue to skip";
     }
-
-    console.log(index, queue.length);
 
     if (typeof index !== "number") {
       return `Invalid index ${index}`;
@@ -44,7 +40,7 @@ const removeCommand = {
     }
 
     const removedSong = removeAtIndex(queue, index - 1);
-    console.log(removedSong);
+
     if (removedSong) {
       return `Removed the current song at index **${index}**: **${removedSong.title}**.`;
     }
