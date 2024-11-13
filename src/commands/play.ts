@@ -76,6 +76,10 @@ const playCommand = {
         url: video.url,
       };
 
+      if (hasDisallowedWords(song.title)) {
+        return `Song **${song.title}** has disallowed words!`;
+      }
+
       const guild = client.guilds.cache.get(data.guildId);
       if (!guild) {
         return "Could not find the guild.";
