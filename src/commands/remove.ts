@@ -20,6 +20,8 @@ const removeCommand = {
     .setDescription("Remove a song from the list"),
 
   async execute(data: Record<string, any>) {
+    console.log("REMOVE COMMAND");
+
     const index = data.index;
 
     const connection = getConnection();
