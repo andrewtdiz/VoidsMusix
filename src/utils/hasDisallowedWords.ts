@@ -18,9 +18,13 @@ const disallowList =
 ];
 
 export default function(songTitle: string) {
-    const lowerTitle = songTitle.replace(/[^a-zA-Z\s]/g, '').toLowerCase();
-    
-    return disallowList.some(word => 
-      lowerTitle.includes(word.toLowerCase())
-    );
+  const lowerTitle = songTitle.replace(/[^a-zA-Z\s]/g, '').toLowerCase();
+
+  for (const word of disallowList) {
+      if (lowerTitle.includes(word.toLowerCase())) {
+          return word;
+      }
+  }
+
+  return null;
 }

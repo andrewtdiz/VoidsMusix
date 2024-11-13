@@ -68,9 +68,10 @@ const playCommand = {
       };
 
       console.log(song.title);
+      const word = hasDisallowedWords(song.title);
 
-      if (hasDisallowedWords(song.title)) {
-        return `**Cannot Play** Title: "${song.title}" has disallowed words.`;
+      if (word) {
+        return `**Cannot Play** Title: "${song.title}" has disallowed word: ${word}.`;
       }
 
       const guild = client.guilds.cache.get(data.guildId);
