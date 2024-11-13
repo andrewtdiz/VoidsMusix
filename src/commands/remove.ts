@@ -35,11 +35,11 @@ const removeCommand = {
     console.log(index, queue.length);
 
     if (!index || typeof index !== "number") {
-      return "Invalid index";
+      return `Invalid index ${index}`;
     }
     const luaIndex = index + 1;
     if (luaIndex > queue.length) {
-      return "Invalid index";
+      return `Invalid index ${index}, queue length ${queue.length}`;
     }
 
     if (queue.length > 0) {
