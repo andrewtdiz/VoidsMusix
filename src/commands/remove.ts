@@ -32,6 +32,8 @@ const removeCommand = {
       return "No song to skip";
     }
 
+    console.log(index, queue.length);
+
     if (!index || typeof index !== "number") {
       return "Invalid index";
     }
