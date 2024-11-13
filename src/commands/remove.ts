@@ -39,13 +39,12 @@ const removeCommand = {
     if (!index || typeof index !== "number") {
       return `Invalid index ${index}`;
     }
-    const luaIndex = index + 1;
-    if (luaIndex > queue.length) {
+    if (index > queue.length) {
       return `Invalid index ${index}, queue length ${queue.length}`;
     }
 
     if (queue.length > 0) {
-      const removedSong = removeAtIndex(queue, luaIndex);
+      const removedSong = removeAtIndex(queue, index + 1);
 
       if (removedSong) {
         return `Removed the current song at index **${index}**: **${removedSong.title}**.`;
