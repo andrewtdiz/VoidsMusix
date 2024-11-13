@@ -12,8 +12,7 @@ import {
   client,
 } from "../index";
 import play from "play-dl";
-import { logAction } from "../utils/logAction";
-import { isInSameVoiceChannelAsBot } from "../utils/isInSameVoiceChannelAsBot";
+import hasDisallowedWords from "../utils/hasDisallowedWords";
 
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
@@ -75,6 +74,12 @@ const playCommand = {
         title: video.title || "Unknown Title",
         url: video.url,
       };
+
+      console.log(song.title);
+
+      if (hasDisallowedWords(song.title)) {
+        return `Song **${song.title}** has disallowed words!`;
+      }
 
       const guild = client.guilds.cache.get(data.guildId);
       if (!guild) {

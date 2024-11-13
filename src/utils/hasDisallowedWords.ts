@@ -17,6 +17,10 @@ const disallowList =
     "Vladimir Putin", "vote", "voting", "welfare", "Xi Jinping"
 ];
 
-function hasDisallowedWords(songName: string): boolean {
-    return disallowList.some(word => songName.toLowerCase().includes(word.toLowerCase()));
+export default function(songTitle: string) {
+    const lowerTitle = songTitle.toLowerCase();
+    
+    return disallowList.some(word => 
+      lowerTitle.includes(word.toLowerCase())
+    );
   }
