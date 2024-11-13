@@ -43,14 +43,11 @@ const removeCommand = {
       return `Invalid index ${index}, queue length ${queue.length}`;
     }
 
-    if (queue.length > 0) {
-      const removedSong = removeAtIndex(queue, index - 1);
-
-      if (removedSong) {
-        return `Removed the current song at index **${index}**: **${removedSong.title}**.`;
-      }
+    const removedSong = removeAtIndex(queue, index - 1);
+    console.log(removedSong);
+    if (removedSong) {
+      return `Removed the current song at index **${index}**: **${removedSong.title}**.`;
     }
-
     return `No song at index ${index}`;
   },
 };
