@@ -9,7 +9,7 @@ import {
 
 function removeAtIndex<T>(array: T[], index: number): T | null {
   if (index >= 0 && index < array.length) {
-    return array.splice(index, 1)[1];
+    return array.splice(index, 1)[0];
   }
   return null;
 }
