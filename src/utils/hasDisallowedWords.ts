@@ -23,4 +23,4 @@ export default function(songTitle: string) {
     return disallowList.some(word => 
       lowerTitle.includes(word.toLowerCase())
     );
-  }
+}
