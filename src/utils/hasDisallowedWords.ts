@@ -12,7 +12,7 @@ const disallowList =
     "MAGA", "make america great again", "Buttigieg", "midterms", "Mitch McConnell", "Nancy Pelosi", "Narendra Modi",
     "nationalists", "neoconservatives", "neoliberals", "no justice no peace", "NSA", "parliament", "politician",
     "politics", "populism", "president", "prime minister", "progressives", "protests", "proud boys", "QAnon",
-    "Recep Erdogan", "referendum", "reform", "republican", "republicans", "revolution", "right-wing", "immigrants", "deport", "deportation",
+    "Recep Erdogan", "referendum", "reform", "republican", "republicans", "right-wing", "immigrants", "deport", "deportation",
     "Ron DeSantis", "sedition", "senate", "socialism", "socialist party", "Supreme Court", "taxation", "Ted Cruz",
     "Vladimir Putin", "vote", "voting", "welfare", "Ben Shapiro", "Xi Jinping"
 ];
