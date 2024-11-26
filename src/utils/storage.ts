@@ -43,8 +43,14 @@ export default class JSONStorage {
 
   private getItem<T>(key: string): T | null {
     try {
-      const data = JSON.parse(fs.readFileSync(this.storagePath, "utf8"));
-      return data[key] || null;
+      let data = {};
+      try {
+        data = JSON.parse(fs.readFileSync(this.storagePath, "utf8"));
+      } catch {
+        fs.writeFileSync(this.storagePath, "{}", "utf8");
+        data = {};
+      }
+      return (data as Record<string, T>)[key] || null;
     } catch (error) {
       console.error("Error reading from storage:", error);
       return null;
@@ -53,8 +59,14 @@ export default class JSONStorage {
 
   private setItem(key: string, value: any): boolean {
     try {
-      const data = JSON.parse(fs.readFileSync(this.storagePath, "utf8"));
-      data[key] = value;
+      let data = {};
+      try {
+        data = JSON.parse(fs.readFileSync(this.storagePath, "utf8"));
+      } catch {
+        fs.writeFileSync(this.storagePath, "{}", "utf8");
+        data = {};
+      }
+      (data as Record<string, any>)[key] = value;
       fs.writeFileSync(this.storagePath, JSON.stringify(data, null, 2), "utf8");
       return true;
     } catch (error) {
