@@ -124,20 +124,6 @@ client.login(process.env.DISCORD_TOKEN);
 
 client.once("ready", (client) => {
   console.log(`Logged in as ${client.user?.tag}!`);
-
-  const guild = client.guilds.cache.first();
-  if (!guild) return;
-  console.log(guild.id);
-
-  const currentConnection = getVoiceConnection(guild.id);
-  
-  console.log(currentConnection);
-
-  if (currentConnection && currentSong) {
-    queue.unshift(currentSong);
-    JSONStorage.set("queue", queue);
-    playNextSong(currentConnection);
-  }
 });
 
 export let playbackStartTime: number | null = null;
@@ -211,6 +197,16 @@ export async function playNextSong(connection: VoiceConnection) {
   //@ts-ignore
   if (idleTimeout) clearTimeout(idleTimeout);
 }
+
+process.on("SIGINT", () => {
+  connection?.destroy();
+  process.exit();
+});
+
+process.on("SIGTERM", () => {
+  connection?.destroy();
+  process.exit();
+});
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
