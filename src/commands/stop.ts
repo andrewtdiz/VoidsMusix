@@ -1,4 +1,3 @@
-import { SlashCommandBuilder, CommandInteraction, CacheType } from "discord.js";
 import { getVoiceConnection } from "@discordjs/voice";
 import {
   queue,
@@ -6,8 +5,6 @@ import {
   setCurrentSong,
   destroyConnection,
 } from "../index";
-import { logAction } from "../utils/logAction";
-import { isInSameVoiceChannelAsBot } from "../utils/isInSameVoiceChannelAsBot";
 
 const stopCommand = {
   name: "stop",

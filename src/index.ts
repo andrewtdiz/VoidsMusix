@@ -8,6 +8,7 @@ import {
   AudioResource,
   StreamType,
   VoiceConnection,
+  getVoiceConnection,
 } from "@discordjs/voice";
 import { config } from "dotenv";
 import { REST } from "@discordjs/rest";
@@ -121,8 +122,18 @@ const rest = new REST({ version: "10" }).setToken(
 
 client.login(process.env.DISCORD_TOKEN);
 
-client.once("ready", () => {
+client.once("ready", (client) => {
   console.log(`Logged in as ${client.user?.tag}!`);
+
+  const guild = client.guilds.cache.first();
+
+  if (!guild) return;
+
+  const currentConnection = getVoiceConnection(guild.id);
+
+  if (currentConnection && currentSong) {
+    playNextSong(currentConnection);
+  }
 });
 
 export let playbackStartTime: number | null = null;
