@@ -37,10 +37,6 @@ export default class JSONStorage {
     return JSONStorage.getInstance().setItem(key, value);
   }
 
-  public static remove(key: string): boolean {
-    return JSONStorage.getInstance().removeItem(key);
-  }
-
   public static clear(): boolean {
     return JSONStorage.getInstance().clearStorage();
   }
@@ -63,18 +59,6 @@ export default class JSONStorage {
       return true;
     } catch (error) {
       console.error("Error writing to storage:", error);
-      return false;
-    }
-  }
-
-  private removeItem(key: string): boolean {
-    try {
-      const data = JSON.parse(fs.readFileSync(this.storagePath, "utf8"));
-      delete data[key];
-      fs.writeFileSync(this.storagePath, JSON.stringify(data, null, 2), "utf8");
-      return true;
-    } catch (error) {
-      console.error("Error removing from storage:", error);
       return false;
     }
   }
