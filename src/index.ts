@@ -126,10 +126,12 @@ client.once("ready", (client) => {
   console.log(`Logged in as ${client.user?.tag}!`);
 
   const guild = client.guilds.cache.first();
-
   if (!guild) return;
+  console.log(guild.id);
 
   const currentConnection = getVoiceConnection(guild.id);
+  
+  console.log(currentConnection);
 
   if (currentConnection && currentSong) {
     queue.unshift(currentSong);
