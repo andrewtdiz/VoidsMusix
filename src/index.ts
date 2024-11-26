@@ -23,6 +23,7 @@ import removeCommand from "./commands/remove";
 
 import { getLooping } from "./utils/looping";
 import { spawn } from "child_process";
+import JSONStorage from "./utils/storage";
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -40,14 +41,15 @@ export interface Song {
   title: string;
   url: string;
 }
-export let queue: Song[] = [];
-export let currentSong: Song | null = null;
+export let queue: Song[] = JSONStorage.get("queue") || [];
+export let currentSong: Song | null = JSONStorage.get("currentSong") || null;
 export let audioPlayer: AudioPlayer = createAudioPlayer();
 export let connection: VoiceConnection | null = null;
 let idleTimeout: NodeJS.Timer | null = null;
 
 export function setCurrentSong(song: Song | null) {
   currentSong = song;
+  JSONStorage.set("currentSong", currentSong);
 }
 
 export function getConnection() {
@@ -144,6 +146,7 @@ export async function playNextSong(connection: VoiceConnection) {
   }
 
   const song = queue.shift()!;
+  JSONStorage.set("queue", queue);
   setCurrentSong(song);
 
   const process = spawn("yt-dlp", [
@@ -180,6 +183,7 @@ export async function playNextSong(connection: VoiceConnection) {
   audioPlayer.once(AudioPlayerStatus.Idle, () => {
     if (getLooping()) {
       queue.unshift(song);
+      JSONStorage.set("queue", queue);
     }
     playNextSong(connection);
   });

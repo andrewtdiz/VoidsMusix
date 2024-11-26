@@ -1,7 +1,7 @@
 const disallowList =
 [
     "#BLM", "#MAGA", "#resist", "abortion", "Alexandria Ocasio-Cortez", "AOC", "JD Vance", "alt-right", "anarchy",
-    "Angela Merkel", "antifa", "autocracy", "ballot", "Bernie Sanders", "BLM", "blue lives", "border",
+    "Angela Merkel", "antifa", "autocracy", "ballot", "Bernie Sanders", "BLM", "blue lives",
     "Boris Johnson", "brexit", "campaign", "capitalism", "civil rights", "climate change", "collusion",
     "communism", "communist party", "congress", "conservative", "coup", "death penalty", "defund the police",
     "democrat", "democrats", "department", "dictator", "Trump", "drain the swamp", "election", "election fraud",

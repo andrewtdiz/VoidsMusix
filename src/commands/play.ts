@@ -13,6 +13,7 @@ import {
 } from "../index";
 import play from "play-dl";
 import hasDisallowedWords from "../utils/hasDisallowedWords";
+import JSONStorage from "../utils/storage";
 
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
@@ -93,6 +94,7 @@ const playCommand = {
       setConnection(connection);
 
       queue.push(song);
+      JSONStorage.set("queue", queue);
       if (audioPlayer.state.status !== AudioPlayerStatus.Playing) {
         playNextSong(connection);
       }
