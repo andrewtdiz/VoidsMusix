@@ -16,14 +16,14 @@ export default {
     if (audioPlayer.state.status === AudioPlayerStatus.Paused && currentSong) {
       audioPlayer.unpause();
       return "Resumed the current song.";
-    } else if (audioPlayer.state.status === AudioPlayerStatus.Idle) {
+    } else if (currentSong) {
       const voiceChannelId = data.voiceChannelId;
       if (!voiceChannelId) {
-        return "Could not find the voice channel.";
+        return `Could not find the voice channel: ${voiceChannelId}.`;
       }
       const guild = client.guilds.cache.get(data.guildId);
       if (!guild) {
-        return "Could not find the guild.";
+        return `Could not find the guild: ${data.guildId}.`;
       }
 
       const connection = joinVoiceChannel({
