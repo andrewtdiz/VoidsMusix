@@ -132,6 +132,8 @@ client.once("ready", (client) => {
   const currentConnection = getVoiceConnection(guild.id);
 
   if (currentConnection && currentSong) {
+    queue.push(currentSong);
+    JSONStorage.set("queue", queue);
     playNextSong(currentConnection);
   }
 });
