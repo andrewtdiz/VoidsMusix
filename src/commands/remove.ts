@@ -6,6 +6,7 @@ import {
   setCurrentSong,
   getConnection,
 } from "../index";
+import JSONStorage from "../utils/storage";
 
 function removeAtIndex<T>(array: T[], index: number): T | null {
   if (index >= 0 && index < array.length) {
@@ -38,6 +39,7 @@ const removeCommand = {
     }
 
     const removedSong = removeAtIndex(queue, index - 1);
+    JSONStorage.set("queue", queue);
 
     if (removedSong) {
       return `Removed the current song at index **${index}**: **${removedSong.title}**.`;
