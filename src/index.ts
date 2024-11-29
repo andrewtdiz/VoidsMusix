@@ -25,6 +25,7 @@ import removeCommand from "./commands/remove";
 import { getLooping } from "./utils/looping";
 import { spawn } from "child_process";
 import JSONStorage from "./utils/storage";
+import jumpCommand from "./commands/jump";
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -71,6 +72,7 @@ export function destroyConnection() {
 const commands = [
   playCommand,
   pauseCommand,
+  jumpCommand,
   loopCommand,
   removeCommand,
   resumeCommand,
