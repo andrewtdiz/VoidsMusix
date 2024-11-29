@@ -39,11 +39,22 @@ const queueCommand = {
           }\n`
         : "Nothing is currently playing.\n";
 
+      const shortenedQueue = queue.slice(0, Math.min(5, queue.length));
+
+      const remainingQueueLength = queue.length - shortenedQueue.length;
+
+      const remainingQueueMessage =
+        remainingQueueLength > 0
+          ? `And ${remainingQueueLength} more song${
+              remainingQueueLength > 1 ? "s" : ""
+            }...`
+          : "";
+
       const queueMessage =
         queue.length > 0
-          ? `Upcoming queue:\n${queue
+          ? `Upcoming queue:\n${shortenedQueue
               .map((song, index) => `${index + 1}. **${song.title}**`)
-              .join("\n")}`
+              .join("\n")}\n${remainingQueueMessage}`
           : "The queue is empty.";
 
       return remainingTimeMessage + currentSongMessage + queueMessage;
