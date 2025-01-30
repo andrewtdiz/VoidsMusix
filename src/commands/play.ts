@@ -59,9 +59,9 @@ const playCommand = {
       const durationInSeconds = songInfo.video_details.durationInSec;
       const durationFormatted = formatTime(durationInSeconds);
 
-      if (durationInSeconds > 60 * 10) {
-        return `This song is longer than 10 minutes (${durationFormatted}). Please choose a shorter song.`;
-      }
+      // if (durationInSeconds > 60 * 10) {
+      //   return `This song is longer than 10 minutes (${durationFormatted}). Please choose a shorter song.`;
+      // }
 
       const song = {
         title: video.title || "Unknown Title",
