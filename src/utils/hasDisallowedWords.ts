@@ -7,7 +7,7 @@ const disallowList =
     "democrat", "democrats", "department", "dictator", "Trump", "drain the swamp", "election", "election fraud",
     "Elizabeth Warren", "Emmanuel Macron", "fascism", "FBI", "federal", "freedom of speech", "government", "governor",
     "green party", "gun control", "gun rights", "healthcare", "Hillary Clinton", "immigration", "impeachment",
-    "insurrection", "IRS", "Bolsonaro", "Joe Biden", "Trudeau", "Kamala Harris", "labor party",
+    "insurrection", "Bolsonaro", "Joe Biden", "Trudeau", "Kamala Harris", "labor party",
     "law enforcement", "left-wing", "LGBT rights", "liberal", "libertarian", "local government", "lock her up",
     "MAGA", "make america great again", "Buttigieg", "midterms", "Mitch McConnell", "Nancy Pelosi", "Narendra Modi",
     "nationalists", "neoconservatives", "neoliberals", "no justice no peace", "parliament", "politician",
