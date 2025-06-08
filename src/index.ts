@@ -59,6 +59,9 @@ export function getConnection() {
 }
 
 export function setConnection(newConnection: VoiceConnection) {
+  if (connection && connection !== newConnection) {
+    connection.destroy();
+  }
   connection = newConnection;
 }
 
