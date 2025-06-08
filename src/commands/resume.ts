@@ -6,7 +6,7 @@ import {
   queue,
   playNextSong,
 } from "../index";
-import { AudioPlayerStatus, joinVoiceChannel } from "@discordjs/voice";
+import { AudioPlayerStatus, joinVoiceChannel, getVoiceConnection } from "@discordjs/voice";
 import JSONStorage from "../utils/storage";
 
 export default {
@@ -26,11 +26,14 @@ export default {
         return `Could not find the guild: ${data.guildId}.`;
       }
 
-      const connection = joinVoiceChannel({
-        channelId: voiceChannelId,
-        guildId: guild.id,
-        adapterCreator: guild.voiceAdapterCreator,
-      });
+      let connection = getVoiceConnection(guild.id);
+      if (!connection) {
+        connection = joinVoiceChannel({
+          channelId: voiceChannelId,
+          guildId: guild.id,
+          adapterCreator: guild.voiceAdapterCreator,
+        });
+      }
 
       setConnection(connection);
 

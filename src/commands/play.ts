@@ -1,6 +1,7 @@
-import { SlashCommandBuilder, CommandInteraction, CacheType } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
 import {
   joinVoiceChannel,
+  getVoiceConnection,
   AudioPlayerStatus,
   VoiceConnection,
 } from "@discordjs/voice";
@@ -23,23 +24,6 @@ function formatTime(seconds: number): string {
   }${remainingSeconds} minutes`;
 }
 
-function getConnection(
-  interaction: CommandInteraction<CacheType>
-): VoiceConnection | null {
-  const member = interaction.member;
-  const guild = interaction.guild;
-
-  if (!member || !("voice" in member) || !member.voice.channel || !guild) {
-    console.log("Invalid member.");
-    return null;
-  }
-
-  return joinVoiceChannel({
-    channelId: member.voice.channel.id,
-    guildId: guild.id,
-    adapterCreator: guild.voiceAdapterCreator,
-  });
-}
 
 const playCommand = {
   name: "play",
@@ -84,11 +68,14 @@ const playCommand = {
         return "Could not find the voice channel.";
       }
 
-      const connection = joinVoiceChannel({
-        channelId: voiceChannelId,
-        guildId: guild.id,
-        adapterCreator: guild.voiceAdapterCreator,
-      });
+      let connection = getVoiceConnection(guild.id);
+      if (!connection) {
+        connection = joinVoiceChannel({
+          channelId: voiceChannelId,
+          guildId: guild.id,
+          adapterCreator: guild.voiceAdapterCreator,
+        });
+      }
 
       setConnection(connection);
 
