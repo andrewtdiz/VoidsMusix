@@ -6,6 +6,7 @@ import {
   setCurrentSong,
   destroyConnection,
   getConnection,
+  currentSong,
 } from "../index";
 import { logAction } from "../utils/logAction";
 import { isInSameVoiceChannelAsBot } from "../utils/isInSameVoiceChannelAsBot";
@@ -20,11 +21,15 @@ const skipCommand = {
       return "No active voice connection.";
     }
 
+    // Capture the current song name before skipping
+    const currentSongName = currentSong ? currentSong.title : null;
+    const currentSongMessage = currentSongName ? `**${currentSongName}**` : "the current song";
+
     if (queue.length === 0) {
       audioPlayer.stop();
-      destroyConnection;
+      destroyConnection();
 
-      return "Skipped the current song";
+      return `Skipped ${currentSongMessage}`;
     }
 
     audioPlayer.stop();
@@ -34,13 +39,13 @@ const skipCommand = {
       const nextSong = queue[0];
 
       if (nextSong) {
-        return `Skipped the current song. Now playing **${nextSong.title}**.`;
+        return `Skipped ${currentSongMessage}. Now playing **${nextSong.title}**.`;
       }
     }
 
     setCurrentSong(null);
 
-    return "Skipped the current song";
+    return `Skipped ${currentSongMessage}`;
   },
 };
 
