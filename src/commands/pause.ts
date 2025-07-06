@@ -14,18 +14,18 @@ export default {
     if (audioPlayer.state.status === AudioPlayerStatus.Playing && currentSong) {
       audioPlayer.pause();
 
-      const songInfo = await play.video_info(currentSong.url);
-      const durationInSeconds = songInfo.video_details.durationInSec;
+      // const songInfo = "PLACEHOLDER";
+      // const durationInSeconds = 100;
       const currentTime = Date.now();
       const elapsed = Math.floor(
         (currentTime - (playbackStartTime ?? currentTime)) / 1000
       );
-      const remainingTime = durationInSeconds - elapsed;
-      const remainingFormatted = new Date(remainingTime * 1000)
-        .toISOString()
-        .substr(11, 8);
+      // const remainingTime = durationInSeconds - elapsed;
+      // const remainingFormatted = new Date(remainingTime * 1000)
+        // .toISOString()
+        // .substr(11, 8);
 
-      return `Paused the current song. Time left: ${remainingFormatted}`;
+      return `Paused the current song.`;
     } else {
       return "No song is currently playing.";
     }
