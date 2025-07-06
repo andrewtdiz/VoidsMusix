@@ -21,16 +21,16 @@ const queueCommand = {
       let remainingTimeMessage = "";
 
       if (currentSong && playbackStartTime) {
-        // const songInfo = await play.video_info(currentSong.url);
-        // const durationInSeconds = songInfo.video_details.durationInSec;
+        const songInfo = await play.video_info(currentSong.url);
+        const durationInSeconds = songInfo.video_details.durationInSec;
         const elapsedTime = Math.floor((Date.now() - playbackStartTime) / 1000);
-        // const remainingTime = durationInSeconds - elapsedTime;
+        const remainingTime = durationInSeconds - elapsedTime;
 
-        // if (remainingTime > 0) {
-        //   remainingTimeMessage = `Time left for the current song: **${formatTime(
-        //     remainingTime
-        //   )}**\n\n`;
-        // }
+        if (remainingTime > 0) {
+          remainingTimeMessage = `Time left for the current song: **${formatTime(
+            remainingTime
+          )}**\n\n`;
+        }
       }
 
       const currentSongMessage = currentSong

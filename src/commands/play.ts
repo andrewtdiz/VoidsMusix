@@ -39,9 +39,9 @@ const playCommand = {
         return "No results found for your query.";
       }
 
-      // const songInfo = await play.video_info(video.url);
-      // const durationInSeconds = songInfo.video_details.durationInSec;
-      // const durationFormatted = formatTime(durationInSeconds);
+      const songInfo = await play.video_info(video.url);
+      const durationInSeconds = songInfo.video_details.durationInSec;
+      const durationFormatted = formatTime(durationInSeconds);
 
       // if (durationInSeconds > 60 * 10) {
       //   return `This song is longer than 10 minutes (${durationFormatted}). Please choose a shorter song.`;
@@ -85,7 +85,7 @@ const playCommand = {
         playNextSong(connection);
       }
 
-      return `Added **${song.title}** to the queue!`;
+      return `Added **${song.title}** to the queue! Duration: ${durationFormatted}`;
     } catch (error) {
       console.error("Error handling play command:", error);
       return "There was an error trying to execute this command!";
