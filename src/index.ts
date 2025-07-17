@@ -26,6 +26,7 @@ import { getLooping } from "./utils/looping";
 import { spawn } from "child_process";
 import JSONStorage from "./utils/storage";
 import jumpCommand from "./commands/jump";
+import { RateLimiter } from "./utils/rateLimit";
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -216,3 +217,8 @@ process.on("SIGTERM", () => {
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
+
+// Clean up rate limiter entries every 5 minutes to prevent memory leaks
+setInterval(() => {
+  RateLimiter.cleanup();
+}, 5 * 60 * 1000);

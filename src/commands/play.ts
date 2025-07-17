@@ -15,6 +15,7 @@ import {
 import play from "play-dl";
 import hasDisallowedWords from "../utils/hasDisallowedWords";
 import JSONStorage from "../utils/storage";
+import { RateLimiter } from "../utils/rateLimit";
 
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
@@ -24,12 +25,27 @@ function formatTime(seconds: number): string {
   }${remainingSeconds} minutes`;
 }
 
-
 const playCommand = {
   name: "play",
 
   async execute(data: Record<string, any>) {
     try {
+      const userId = data.userId;
+      if (!userId) {
+        return "Could not identify user for rate limiting.";
+      }
+
+      if (RateLimiter.isRateLimited(userId)) {
+        const timeRemaining = RateLimiter.getTimeRemaining(userId);
+        const minutes = Math.floor(timeRemaining / 60000);
+        const seconds = Math.floor((timeRemaining % 60000) / 1000);
+        return `⏰ **Rate Limited!** You can only add 2 songs per minute. Please wait ${minutes}:${seconds
+          .toString()
+          .padStart(2, "0")} before adding another song.`;
+      }
+
+      RateLimiter.trackRequest(userId);
+
       const query = data.query;
       if (!query) return "No results found for your query.";
       const searchResult = await play.search(query, { limit: 1 });
