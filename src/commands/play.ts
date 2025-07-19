@@ -29,7 +29,7 @@ const playCommand = {
 
   async execute(data: Record<string, any>) {
     try {
-      const userId = data.userId ?? 0;
+      const userId = data.userId ?? 1;
       if (!userId) {
         return "Could not identify user for rate limiting.";
       }
