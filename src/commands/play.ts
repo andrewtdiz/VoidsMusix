@@ -20,9 +20,8 @@ import { RateLimiter } from "../utils/rateLimit";
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${
-    remainingSeconds < 10 ? "0" : ""
-  }${remainingSeconds} minutes`;
+  return `${minutes}:${remainingSeconds < 10 ? "0" : ""
+    }${remainingSeconds} minutes`;
 }
 
 const playCommand = {
@@ -30,7 +29,7 @@ const playCommand = {
 
   async execute(data: Record<string, any>) {
     try {
-      const userId = data.userId;
+      const userId = data.userId ?? 0;
       if (!userId) {
         return "Could not identify user for rate limiting.";
       }
