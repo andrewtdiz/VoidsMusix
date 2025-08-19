@@ -24,6 +24,8 @@ import removeCommand from "./commands/remove";
 
 import { getLooping } from "./utils/looping";
 import { spawn } from "child_process";
+import fs from "fs";
+import Cache from "./utils/cache";
 import JSONStorage from "./utils/storage";
 import jumpCommand from "./commands/jump";
 import { RateLimiter } from "./utils/rateLimit";
@@ -156,36 +158,103 @@ export async function playNextSong(connection: VoiceConnection) {
   JSONStorage.set("queue", queue);
   setCurrentSong(song);
 
-  const process = spawn("yt-dlp", [
-    "-o",
-    "-",
-    "-f",
-    "bestaudio",
-    "--quiet",
-    "--no-warnings",
-    song.url,
-  ]);
+  const local = Cache.findLocalForUrl(song.url);
+  let resource: AudioResource;
+  if (local) {
+    const { audioPath } = local;
+    try {
+      resource = createAudioResource(fs.createReadStream(audioPath), {
+        inputType: StreamType.Arbitrary,
+      });
+    } catch (error) {
+      console.error("Failed to create audio resource from local file:", error);
+      // fallback to yt-dlp streaming
+      const child = spawn("yt-dlp", [
+        "-o",
+        "-",
+        "-f",
+        "bestaudio",
+        "--quiet",
+        "--no-warnings",
+        song.url,
+      ]);
+      child.on("error", (err) => {
+        console.error(`Error spawning yt-dlp: ${err.message}`);
+        playNextSong(connection);
+      });
+      resource = createAudioResource(child.stdout, {
+        inputType: StreamType.Arbitrary,
+      });
+      audioPlayer.play(resource);
+      connection.subscribe(audioPlayer);
+      playbackStartTime = Date.now();
+      child.on("exit", (code) => {
+        if (code !== 0) {
+          console.error(`yt-dlp exited with code ${code}. Skipping this song.`);
+          playNextSong(connection);
+        }
+      });
+      audioPlayer.once(AudioPlayerStatus.Idle, () => {
+        if (getLooping()) {
+          queue.unshift(song);
+          JSONStorage.set("queue", queue);
+        }
+        playNextSong(connection);
+      });
+      audioPlayer.on("error", (err) => {
+        console.error("Audio player error:", err);
+        playNextSong(connection);
+      });
+      //@ts-ignore
+      if (idleTimeout) clearTimeout(idleTimeout);
+      return;
+    }
+  } else {
+    const child = spawn("yt-dlp", [
+      "-o",
+      "-",
+      "-f",
+      "bestaudio",
+      "--quiet",
+      "--no-warnings",
+      song.url,
+    ]);
+    child.on("error", (error) => {
+      console.error(`Error spawning yt-dlp: ${error.message}`);
+      playNextSong(connection);
+    });
+    resource = createAudioResource(child.stdout, {
+      inputType: StreamType.Arbitrary,
+    });
+    audioPlayer.play(resource);
+    connection.subscribe(audioPlayer);
+    playbackStartTime = Date.now();
+    child.on("exit", (code) => {
+      if (code !== 0) {
+        console.error(`yt-dlp exited with code ${code}. Skipping this song.`);
+        playNextSong(connection);
+      }
+    });
+    audioPlayer.once(AudioPlayerStatus.Idle, () => {
+      if (getLooping()) {
+        queue.unshift(song);
+        JSONStorage.set("queue", queue);
+      }
+      playNextSong(connection);
+    });
+    audioPlayer.on("error", (error) => {
+      console.error("Audio player error:", error);
+      playNextSong(connection);
+    });
+    //@ts-ignore
+    if (idleTimeout) clearTimeout(idleTimeout);
+    return;
+  }
 
-  process.on("error", (error) => {
-    console.error(`Error spawning yt-dlp: ${error.message}`);
-    playNextSong(connection);
-  });
-
-  const resource: AudioResource = createAudioResource(process.stdout, {
-    inputType: StreamType.Arbitrary,
-  });
-
+  // If we are here and useLocal is true and no exception occurred
   audioPlayer.play(resource);
   connection.subscribe(audioPlayer);
-
   playbackStartTime = Date.now();
-
-  process.on("exit", (code) => {
-    if (code !== 0) {
-      console.error(`yt-dlp exited with code ${code}. Skipping this song.`);
-      playNextSong(connection);
-    }
-  });
 
   audioPlayer.once(AudioPlayerStatus.Idle, () => {
     if (getLooping()) {

@@ -16,6 +16,7 @@ import play from "play-dl";
 import hasDisallowedWords from "../utils/hasDisallowedWords";
 import JSONStorage from "../utils/storage";
 import { RateLimiter } from "../utils/rateLimit";
+import Cache from "../utils/cache";
 
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
@@ -54,14 +55,9 @@ const playCommand = {
         return "No results found for your query.";
       }
 
-      let durationFormatted = "";
-      try {
-        const songInfo = await play.video_info(video.url);
-        const durationInSeconds = songInfo.video_details.durationInSec;
-        durationFormatted = formatTime(durationInSeconds);
-      } catch (err) {
-        durationFormatted = "";
-      }
+      const songInfo = await play.video_info(video.url);
+      const durationInSeconds = songInfo.video_details.durationInSec;
+      const durationFormatted = formatTime(durationInSeconds);
 
       // if (durationInSeconds > 60 * 10) {
       //   return `This song is longer than 10 minutes (${durationFormatted}). Please choose a shorter song.`;
@@ -71,6 +67,17 @@ const playCommand = {
         title: video.title || "Unknown Title",
         url: video.url,
       };
+
+      try {
+        Cache.saveMetadata(song.url, {
+          title: song.title,
+          url: song.url,
+          durationInSeconds,
+          video_details: songInfo.video_details,
+        });
+      } catch (e) {
+        console.error("Failed to save metadata to cache:", e);
+      }
 
       const word = hasDisallowedWords(song.title);
 
