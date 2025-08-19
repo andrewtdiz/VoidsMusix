@@ -34,6 +34,9 @@ const playCommand = {
         return "Could not identify user for rate limiting.";
       }
 
+      const query = data.query;
+      if (!query) return "No results found for your query.";
+
       if (RateLimiter.isRateLimited(userId)) {
         const timeRemaining = RateLimiter.getTimeRemaining(userId);
         const minutes = Math.floor(timeRemaining / 60000);
@@ -44,9 +47,6 @@ const playCommand = {
       }
 
       RateLimiter.trackRequest(userId);
-
-      const query = data.query;
-      if (!query) return "No results found for your query.";
       const searchResult = await play.search(query, { limit: 1 });
       const video = searchResult[0];
 
@@ -54,9 +54,14 @@ const playCommand = {
         return "No results found for your query.";
       }
 
-      const songInfo = await play.video_info(video.url);
-      const durationInSeconds = songInfo.video_details.durationInSec;
-      const durationFormatted = formatTime(durationInSeconds);
+      let durationFormatted = "";
+      try {
+        const songInfo = await play.video_info(video.url);
+        const durationInSeconds = songInfo.video_details.durationInSec;
+        durationFormatted = formatTime(durationInSeconds);
+      } catch (err) {
+        durationFormatted = "";
+      }
 
       // if (durationInSeconds > 60 * 10) {
       //   return `This song is longer than 10 minutes (${durationFormatted}). Please choose a shorter song.`;
