@@ -168,45 +168,8 @@ export async function playNextSong(connection: VoiceConnection) {
       });
     } catch (error) {
       console.error("Failed to create audio resource from local file:", error);
-      // fallback to yt-dlp streaming
-      const child = spawn("yt-dlp", [
-        "-o",
-        "-",
-        "-f",
-        "bestaudio",
-        "--quiet",
-        "--no-warnings",
-        song.url,
-      ]);
-      child.on("error", (err) => {
-        console.error(`Error spawning yt-dlp: ${err.message}`);
-        playNextSong(connection);
-      });
-      resource = createAudioResource(child.stdout, {
-        inputType: StreamType.Arbitrary,
-      });
-      audioPlayer.play(resource);
-      connection.subscribe(audioPlayer);
-      playbackStartTime = Date.now();
-      child.on("exit", (code) => {
-        if (code !== 0) {
-          console.error(`yt-dlp exited with code ${code}. Skipping this song.`);
-          playNextSong(connection);
-        }
-      });
-      audioPlayer.once(AudioPlayerStatus.Idle, () => {
-        if (getLooping()) {
-          queue.unshift(song);
-          JSONStorage.set("queue", queue);
-        }
-        playNextSong(connection);
-      });
-      audioPlayer.on("error", (err) => {
-        console.error("Audio player error:", err);
-        playNextSong(connection);
-      });
-      //@ts-ignore
-      if (idleTimeout) clearTimeout(idleTimeout);
+      // do not fallback to yt-dlp for local playback; skip to next track
+      playNextSong(connection);
       return;
     }
   } else {
@@ -223,6 +186,14 @@ export async function playNextSong(connection: VoiceConnection) {
       console.error(`Error spawning yt-dlp: ${error.message}`);
       playNextSong(connection);
     });
+    // capture stdout in-memory while streaming to Discord
+    const chunks: Uint8Array[] = [];
+    let totalBytes = 0;
+    child.stdout.on("data", (chunk: Buffer) => {
+      const view = new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength);
+      chunks.push(view);
+      totalBytes += chunk.length;
+    });
     resource = createAudioResource(child.stdout, {
       inputType: StreamType.Arbitrary,
     });
@@ -235,10 +206,21 @@ export async function playNextSong(connection: VoiceConnection) {
         playNextSong(connection);
       }
     });
-    audioPlayer.once(AudioPlayerStatus.Idle, () => {
+    audioPlayer.once(AudioPlayerStatus.Idle, async () => {
       if (getLooping()) {
         queue.unshift(song);
         JSONStorage.set("queue", queue);
+      }
+      try {
+        const { audioPath } = Cache.getPathsForUrl(song.url);
+        if (!fs.existsSync(audioPath)) {
+          const combined = Buffer.concat(chunks, totalBytes);
+          const u8 = new Uint8Array(combined.buffer, combined.byteOffset, combined.byteLength);
+          await fs.promises.writeFile(audioPath, u8);
+          console.log(`[Cache] Wrote streamed audio to`, { audioPath, totalBytes });
+        }
+      } catch (e) {
+        console.error("Failed to persist streamed audio buffer:", e);
       }
       playNextSong(connection);
     });
