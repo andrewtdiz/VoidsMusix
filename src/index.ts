@@ -51,6 +51,7 @@ export let currentSong: Song | null = JSONStorage.get("currentSong") || null;
 export let audioPlayer: AudioPlayer = createAudioPlayer();
 export let connection: VoiceConnection | null = null;
 let idleTimeout: NodeJS.Timer | null = null;
+export let isStartingPlayback: boolean = false;
 
 export function setCurrentSong(song: Song | null) {
   currentSong = song;
@@ -151,12 +152,15 @@ export async function playNextSong(connection: VoiceConnection) {
   if (queue.length === 0) {
     setCurrentSong(null);
     leaveVoiceChannelAfterTimeout();
+    isStartingPlayback = false;
     return;
   }
 
   const song = queue.shift()!;
   JSONStorage.set("queue", queue);
   setCurrentSong(song);
+
+  isStartingPlayback = true;
 
   const local = Cache.findLocalForUrl(song.url);
   let resource: AudioResource;
@@ -169,6 +173,7 @@ export async function playNextSong(connection: VoiceConnection) {
     } catch (error) {
       console.error("Failed to create audio resource from local file:", error);
       // do not fallback to yt-dlp for local playback; skip to next track
+      isStartingPlayback = false;
       playNextSong(connection);
       return;
     }
@@ -184,6 +189,7 @@ export async function playNextSong(connection: VoiceConnection) {
     ]);
     child.on("error", (error) => {
       console.error(`Error spawning yt-dlp: ${error.message}`);
+      isStartingPlayback = false;
       playNextSong(connection);
     });
     // capture stdout in-memory while streaming to Discord
@@ -200,6 +206,7 @@ export async function playNextSong(connection: VoiceConnection) {
     audioPlayer.play(resource);
     connection.subscribe(audioPlayer);
     playbackStartTime = Date.now();
+    isStartingPlayback = false;
     child.on("exit", (code) => {
       if (code !== 0) {
         console.error(`yt-dlp exited with code ${code}. Skipping this song.`);
@@ -237,6 +244,7 @@ export async function playNextSong(connection: VoiceConnection) {
   audioPlayer.play(resource);
   connection.subscribe(audioPlayer);
   playbackStartTime = Date.now();
+  isStartingPlayback = false;
 
   audioPlayer.once(AudioPlayerStatus.Idle, () => {
     if (getLooping()) {

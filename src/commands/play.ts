@@ -11,6 +11,7 @@ import {
   audioPlayer,
   setConnection,
   client,
+  isStartingPlayback,
 } from "../index";
 import play from "play-dl";
 import hasDisallowedWords from "../utils/hasDisallowedWords";
@@ -108,7 +109,7 @@ const playCommand = {
 
       queue.push(song);
       JSONStorage.set("queue", queue);
-      if (audioPlayer.state.status !== AudioPlayerStatus.Playing) {
+      if (audioPlayer.state.status !== AudioPlayerStatus.Playing && !isStartingPlayback) {
         playNextSong(connection);
       }
 
