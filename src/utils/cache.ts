@@ -140,6 +140,22 @@ export default class Cache {
     return metadataPath;
   }
 
+  public static loadMetadata<T = any>(url: string): T | null {
+    const { metadataPath } = this.getPathsForUrl(url);
+    try {
+      if (!fs.existsSync(metadataPath)) {
+        return null;
+      }
+      const content = fs.readFileSync(metadataPath, "utf8");
+      const metadata = JSON.parse(content) as T;
+      console.log(`[Cache] Loaded metadata`, { url, metadataPath });
+      return metadata;
+    } catch (error) {
+      console.error(`[Cache] Failed to load metadata for URL ${url}:`, error);
+      return null;
+    }
+  }
+
   public static findLocalForUrl(
     url: string,
   ): { audioPath: string; metadataPath: string } | null {

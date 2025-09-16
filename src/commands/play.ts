@@ -13,17 +13,24 @@ import {
   client,
   isStartingPlayback,
 } from "../index";
+import type { Song } from "../index";
 import play from "play-dl";
 import hasDisallowedWords from "../utils/hasDisallowedWords";
 import JSONStorage from "../utils/storage";
 import { RateLimiter } from "../utils/rateLimit";
 import Cache from "../utils/cache";
 
-function formatTime(seconds: number): string {
+function formatTime(seconds: number | null | undefined): string {
+  if (typeof seconds !== "number" || !Number.isFinite(seconds)) {
+    return "Unknown duration";
+  }
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${remainingSeconds < 10 ? "0" : ""
-    }${remainingSeconds} minutes`;
+  return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds} minutes`;
+}
+
+function isYouTubeUrl(value: string): boolean {
+  return /^(https?:\/\/)?(www\.|m\.)?(youtube\.com|youtu\.be)\//i.test(value);
 }
 
 const playCommand = {
@@ -49,36 +56,115 @@ const playCommand = {
       }
 
       RateLimiter.trackRequest(userId);
-      const searchResult = await play.search(query, { limit: 1 });
-      const video = searchResult[0];
+      const trimmedQuery = String(query).trim();
 
-      if (!video) {
+      let songUrl: string | null = null;
+      let songTitle: string | null = null;
+      let durationInSeconds: number | null = null;
+
+      if (isYouTubeUrl(trimmedQuery)) {
+        songUrl = trimmedQuery;
+        const cachedMetadata = Cache.loadMetadata<{
+          title?: string;
+          url?: string;
+          durationInSeconds?: number | null;
+          video_details?: { title?: string; durationInSec?: number };
+        }>(songUrl);
+
+        if (cachedMetadata) {
+          if (typeof cachedMetadata.title === "string") {
+            songTitle = cachedMetadata.title;
+          } else if (
+            cachedMetadata.video_details &&
+            typeof cachedMetadata.video_details.title === "string"
+          ) {
+            songTitle = cachedMetadata.video_details.title;
+          }
+
+          const cachedDuration =
+            cachedMetadata.durationInSeconds ??
+            cachedMetadata.video_details?.durationInSec ??
+            null;
+
+          if (
+            typeof cachedDuration === "number" &&
+            Number.isFinite(cachedDuration)
+          ) {
+            durationInSeconds = cachedDuration;
+          }
+        }
+
+        if (!songTitle || durationInSeconds == null) {
+          const songInfo = await play.video_info(songUrl);
+          const infoDuration = songInfo.video_details.durationInSec;
+          if (
+            typeof infoDuration === "number" &&
+            Number.isFinite(infoDuration)
+          ) {
+            durationInSeconds = infoDuration;
+          } else {
+            durationInSeconds = null;
+          }
+          if (!songTitle) {
+            songTitle = songInfo.video_details.title || "Unknown Title";
+          }
+          try {
+            Cache.saveMetadata(songUrl, {
+              title: songTitle,
+              url: songUrl,
+              durationInSeconds,
+              video_details: songInfo.video_details,
+            });
+          } catch (e) {
+            console.error("Failed to save metadata to cache:", e);
+          }
+        }
+      } else {
+        const searchResult = await play.search(trimmedQuery, { limit: 1 });
+        const video = searchResult[0];
+
+        if (!video) {
+          return "No results found for your query.";
+        }
+
+        songUrl = video.url;
+        songTitle = video.title || "Unknown Title";
+
+        const songInfo = await play.video_info(songUrl);
+        const infoDuration = songInfo.video_details.durationInSec;
+        if (typeof infoDuration === "number" && Number.isFinite(infoDuration)) {
+          durationInSeconds = infoDuration;
+        } else {
+          durationInSeconds = null;
+        }
+
+        try {
+          Cache.saveMetadata(songUrl, {
+            title: songTitle,
+            url: songUrl,
+            durationInSeconds,
+            video_details: songInfo.video_details,
+          });
+        } catch (e) {
+          console.error("Failed to save metadata to cache:", e);
+        }
+      }
+
+      if (!songUrl) {
         return "No results found for your query.";
       }
 
-      const songInfo = await play.video_info(video.url);
-      const durationInSeconds = songInfo.video_details.durationInSec;
+      if (!songTitle) {
+        songTitle = "Unknown Title";
+      }
+
       const durationFormatted = formatTime(durationInSeconds);
 
-      // if (durationInSeconds > 60 * 10) {
-      //   return `This song is longer than 10 minutes (${durationFormatted}). Please choose a shorter song.`;
-      // }
-
-      const song = {
-        title: video.title || "Unknown Title",
-        url: video.url,
+      const song: Song = {
+        title: songTitle,
+        url: songUrl,
+        durationInSeconds,
       };
-
-      try {
-        Cache.saveMetadata(song.url, {
-          title: song.title,
-          url: song.url,
-          durationInSeconds,
-          video_details: songInfo.video_details,
-        });
-      } catch (e) {
-        console.error("Failed to save metadata to cache:", e);
-      }
 
       const word = hasDisallowedWords(song.title);
 

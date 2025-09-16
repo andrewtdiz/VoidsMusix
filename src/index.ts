@@ -45,6 +45,7 @@ export const client = new Client({
 export interface Song {
   title: string;
   url: string;
+  durationInSeconds?: number | null;
 }
 export let queue: Song[] = JSONStorage.get("queue") || [];
 export let currentSong: Song | null = JSONStorage.get("currentSong") || null;
