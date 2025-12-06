@@ -26,11 +26,39 @@ function formatTime(seconds: number | null | undefined): string {
   }
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds} minutes`;
+  return `${minutes}:${
+    remainingSeconds < 10 ? "0" : ""
+  }${remainingSeconds} minutes`;
 }
 
 function isYouTubeUrl(value: string): boolean {
   return /^(https?:\/\/)?(www\.|m\.)?(youtube\.com|youtu\.be)\//i.test(value);
+}
+
+function cleanYouTubeUrl(value: string): string {
+  try {
+    const parsed = new URL(value);
+    const hostname = parsed.hostname.replace(/^www\./i, "");
+
+    if (hostname === "youtu.be") {
+      const videoId = parsed.pathname.split("/").filter(Boolean)[0];
+      return videoId ? `https://www.youtube.com/watch?v=${videoId}` : value;
+    }
+
+    const isYouTubeHost =
+      hostname === "youtube.com" || hostname.endsWith(".youtube.com");
+
+    if (isYouTubeHost) {
+      const videoId = parsed.searchParams.get("v");
+      if (videoId) {
+        return `${parsed.protocol}//${parsed.host}/watch?v=${videoId}`;
+      }
+    }
+
+    return value;
+  } catch {
+    return value;
+  }
 }
 
 const playCommand = {
@@ -63,7 +91,7 @@ const playCommand = {
       let durationInSeconds: number | null = null;
 
       if (isYouTubeUrl(trimmedQuery)) {
-        songUrl = trimmedQuery;
+        songUrl = cleanYouTubeUrl(trimmedQuery);
         const cachedMetadata = Cache.loadMetadata<{
           title?: string;
           url?: string;
@@ -127,7 +155,9 @@ const playCommand = {
           return "No results found for your query.";
         }
 
-        songUrl = video.url;
+        songUrl = isYouTubeUrl(video.url)
+          ? cleanYouTubeUrl(video.url)
+          : video.url;
         songTitle = video.title || "Unknown Title";
 
         const songInfo = await play.video_info(songUrl);
@@ -195,7 +225,10 @@ const playCommand = {
 
       queue.push(song);
       JSONStorage.set("queue", queue);
-      if (audioPlayer.state.status !== AudioPlayerStatus.Playing && !isStartingPlayback) {
+      if (
+        audioPlayer.state.status !== AudioPlayerStatus.Playing &&
+        !isStartingPlayback
+      ) {
         playNextSong(connection);
       }
 
