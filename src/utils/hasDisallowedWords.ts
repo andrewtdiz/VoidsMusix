@@ -10,7 +10,7 @@ const disallowList =
     "insurrection", "Bolsonaro", "Joe Biden", "Trudeau", "Kamala Harris", "labor party",
     "law enforcement", "left-wing", "LGBT rights", "liberal", "libertarian", "local government", "lock her up",
     "MAGA", "make america great again", "Buttigieg", "midterms", "Mitch McConnell", "Nancy Pelosi", "Narendra Modi",
-    "nationalists", "neoconservatives", "neoliberals", "no justice no peace", "parliament", "politician",
+    "nationalists", "neoconservatives", "neoliberals", "no justice no peace", "politician",
     "politics", "populism", "president", "prime minister", "progressives", "protests", "proud boys", "QAnon",
     "Recep Erdogan", "referendum", "reform", "republican", "republicans", "right-wing", "immigrants", "deport", "deportation",
     "Ron DeSantis", "sedition", "senate", "socialism", "socialist party", "Supreme Court", "taxation", "Ted Cruz",
