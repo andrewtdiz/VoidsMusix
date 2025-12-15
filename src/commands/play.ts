@@ -1,4 +1,3 @@
-import { SlashCommandBuilder } from "discord.js";
 import {
   joinVoiceChannel,
   getVoiceConnection,
@@ -14,11 +13,14 @@ import {
   isStartingPlayback,
 } from "../index";
 import type { Song } from "../index";
-import play from "play-dl";
 import hasDisallowedWords from "../utils/hasDisallowedWords";
 import JSONStorage from "../utils/storage";
 import { RateLimiter } from "../utils/rateLimit";
 import Cache from "../utils/cache";
+import {
+  safeGetVideoDetails,
+  searchYouTubeFirst,
+} from "../utils/youtube";
 
 function formatTime(seconds: number | null | undefined): string {
   if (typeof seconds !== "number" || !Number.isFinite(seconds)) {
@@ -123,49 +125,47 @@ const playCommand = {
         }
 
         if (!songTitle || durationInSeconds == null) {
-          const songInfo = await play.video_info(songUrl);
-          const infoDuration = songInfo.video_details.durationInSec;
-          if (
-            typeof infoDuration === "number" &&
-            Number.isFinite(infoDuration)
-          ) {
-            durationInSeconds = infoDuration;
-          } else {
-            durationInSeconds = null;
+          const details = await safeGetVideoDetails(songUrl);
+          if (!songTitle && details.title) {
+            songTitle = details.title;
           }
-          if (!songTitle) {
-            songTitle = songInfo.video_details.title || "Unknown Title";
+          if (durationInSeconds == null) {
+            durationInSeconds = details.durationInSeconds;
           }
           try {
             Cache.saveMetadata(songUrl, {
               title: songTitle,
               url: songUrl,
               durationInSeconds,
-              video_details: songInfo.video_details,
             });
           } catch (e) {
             console.error("Failed to save metadata to cache:", e);
           }
         }
       } else {
-        const searchResult = await play.search(trimmedQuery, { limit: 1 });
-        const video = searchResult[0];
-
-        if (!video) {
+        const searchResult = await searchYouTubeFirst(trimmedQuery);
+        if (!searchResult) {
           return "No results found for your query.";
         }
 
-        songUrl = isYouTubeUrl(video.url)
-          ? cleanYouTubeUrl(video.url)
-          : video.url;
-        songTitle = video.title || "Unknown Title";
+        songUrl = isYouTubeUrl(searchResult.url)
+          ? cleanYouTubeUrl(searchResult.url)
+          : searchResult.url;
+        songTitle = searchResult.title || "Unknown Title";
+        durationInSeconds =
+          typeof searchResult.durationInSeconds === "number" &&
+          Number.isFinite(searchResult.durationInSeconds)
+            ? searchResult.durationInSeconds
+            : null;
 
-        const songInfo = await play.video_info(songUrl);
-        const infoDuration = songInfo.video_details.durationInSec;
-        if (typeof infoDuration === "number" && Number.isFinite(infoDuration)) {
-          durationInSeconds = infoDuration;
-        } else {
-          durationInSeconds = null;
+        if (!durationInSeconds || !songTitle) {
+          const details = await safeGetVideoDetails(songUrl);
+          if (!songTitle) {
+            songTitle = details.title;
+          }
+          if (durationInSeconds == null) {
+            durationInSeconds = details.durationInSeconds;
+          }
         }
 
         try {
@@ -173,7 +173,6 @@ const playCommand = {
             title: songTitle,
             url: songUrl,
             durationInSeconds,
-            video_details: songInfo.video_details,
           });
         } catch (e) {
           console.error("Failed to save metadata to cache:", e);

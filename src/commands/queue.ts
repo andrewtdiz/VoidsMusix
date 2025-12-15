@@ -1,7 +1,6 @@
-import { SlashCommandBuilder, CommandInteraction, CacheType } from "discord.js";
 import { queue, currentSong, playbackStartTime } from "../index";
-import play from "play-dl";
 import { getLooping } from "../utils/looping";
+import { safeGetVideoDetails } from "../utils/youtube";
 
 function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
@@ -21,12 +20,15 @@ const queueCommand = {
       let remainingTimeMessage = "";
 
       if (currentSong && playbackStartTime) {
-        const songInfo = await play.video_info(currentSong.url);
-        const durationInSeconds = songInfo.video_details.durationInSec;
+        const durationInSeconds =
+          currentSong.durationInSeconds ??
+          (await safeGetVideoDetails(currentSong.url)).durationInSeconds ??
+          null;
         const elapsedTime = Math.floor((Date.now() - playbackStartTime) / 1000);
-        const remainingTime = durationInSeconds - elapsedTime;
+        const remainingTime =
+          durationInSeconds != null ? durationInSeconds - elapsedTime : null;
 
-        if (remainingTime > 0) {
+        if (remainingTime != null && remainingTime > 0) {
           remainingTimeMessage = `Time left for the current song: **${formatTime(
             remainingTime
           )}**\n\n`;
